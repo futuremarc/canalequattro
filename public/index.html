@@ -1,0 +1,252 @@
+
+<!DOCTYPE html>
+	<html>
+	<head>
+		<meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<title>Canale Quattro</title>
+		<link href="https://fonts.googleapis.com/css?family=Roboto+Condensed:400" rel="stylesheet">
+        <script src="js/lib/socket.io.min.js"></script>
+        <script src="js/lib/jquery.min.js"></script>
+        <script src="js/lib/three.min.js" type="text/javascript"></script>
+		<script type='x-shader/x-vertex' id='video_vert'>
+			varying vec2 vUv;
+            void main(){
+                vUv = uv;
+                gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+            }
+        </script>
+        <script type='x-shader/x-fragment' id='video_frag'>
+	        vec3 mod289(vec3 x) { return x - floor(x * (1.0 / 289.0)) * 289.0; }
+            vec4 mod289(vec4 x) { return x - floor(x * (1.0 / 289.0)) * 289.0; }
+            vec4 permute(vec4 x) { return mod289(((x*34.0)+1.0)*x); }
+            vec4 taylorInvSqrt(vec4 r) { return 1.79284291400159 - 0.85373472095314 * r; }
+            vec3 fade(vec3  t) { return t*t*t*(t*(t*6.0-15.0)+10.0); }
+            float noise(vec3 P) {
+                vec3 i0 = mod289(floor(P)), i1 = mod289(i0 + vec3(1.0));
+                vec3 f0 = fract(P), f1 = f0 - vec3(1.0), f = fade(f0);
+                vec4 ix = vec4(i0.x, i1.x, i0.x, i1.x), iy = vec4(i0.yy, i1.yy);
+                vec4 iz0 = i0.zzzz, iz1 = i1.zzzz;
+                vec4 ixy = permute(permute(ix) + iy), ixy0 = permute(ixy + iz0), ixy1 = permute(ixy + iz1);
+                vec4 gx0 = ixy0 * (1.0 / 7.0), gy0 = fract(floor(gx0) * (1.0 / 7.0)) - 0.5;
+                vec4 gx1 = ixy1 * (1.0 / 7.0), gy1 = fract(floor(gx1) * (1.0 / 7.0)) - 0.5;
+                gx0 = fract(gx0); gx1 = fract(gx1);
+                vec4 gz0 = vec4(0.5) - abs(gx0) - abs(gy0), sz0 = step(gz0, vec4(0.0));
+                vec4 gz1 = vec4(0.5) - abs(gx1) - abs(gy1), sz1 = step(gz1, vec4(0.0));
+                gx0 -= sz0 * (step(0.0, gx0) - 0.5); gy0 -= sz0 * (step(0.0, gy0) - 0.5);
+                gx1 -= sz1 * (step(0.0, gx1) - 0.5); gy1 -= sz1 * (step(0.0, gy1) - 0.5);
+                vec3 g0 = vec3(gx0.x,gy0.x,gz0.x), g1 = vec3(gx0.y,gy0.y,gz0.y),
+                g2 = vec3(gx0.z,gy0.z,gz0.z), g3 = vec3(gx0.w,gy0.w,gz0.w),
+                g4 = vec3(gx1.x,gy1.x,gz1.x), g5 = vec3(gx1.y,gy1.y,gz1.y),
+                g6 = vec3(gx1.z,gy1.z,gz1.z), g7 = vec3(gx1.w,gy1.w,gz1.w);
+                vec4 norm0 = taylorInvSqrt(vec4(dot(g0,g0), dot(g2,g2), dot(g1,g1), dot(g3,g3)));
+                vec4 norm1 = taylorInvSqrt(vec4(dot(g4,g4), dot(g6,g6), dot(g5,g5), dot(g7,g7)));
+                g0 *= norm0.x; g2 *= norm0.y; g1 *= norm0.z; g3 *= norm0.w;
+                g4 *= norm1.x; g6 *= norm1.y; g5 *= norm1.z; g7 *= norm1.w;
+                vec4 nz = mix(vec4(dot(g0, vec3(f0.x, f0.y, f0.z)), dot(g1, vec3(f1.x, f0.y, f0.z)),
+                dot(g2, vec3(f0.x, f1.y, f0.z)), dot(g3, vec3(f1.x, f1.y, f0.z))),
+                vec4(dot(g4, vec3(f0.x, f0.y, f1.z)), dot(g5, vec3(f1.x, f0.y, f1.z)),
+                dot(g6, vec3(f0.x, f1.y, f1.z)), dot(g7, vec3(f1.x, f1.y, f1.z))), f.z);
+                return 2.2 * mix(mix(nz.x,nz.z,f.y), mix(nz.y,nz.w,f.y), f.x);
+            }
+            float noise(vec2 P) { return noise(vec3(P, 0.0)); }
+            float fractal(vec3 P) {
+                float f = 0., s = 1.;
+                for (int i = 0 ; i < 9 ; i++) {
+                    f += noise(s * P) / s;
+                    s *= 2.;
+                    P = vec3(.866 * P.x + .5 * P.z, P.y + 100., -.5 * P.x + .866 * P.z);
+                }
+                return f;
+            }
+            float turbulence(vec3 P) {
+                float f = 0., s = 1.;
+                for (int i = 0 ; i < 9 ; i++) {
+                    f += abs(noise(s * P)) / s;
+                    s *= 2.;
+                    P = vec3(.866 * P.x + .5 * P.z, P.y + 100., -.5 * P.x + .866 * P.z);
+                }
+                return f;
+            }
+        	float rand(vec2 co){ 
+        		return fract(sin(dot(co.xy ,vec2(12.9898,78.233))) * 43758.5453); 
+        	}
+        	float round(float f){ 
+        		return sign(f) * floor( abs(f) + .5 ); 
+        	}
+            float modulo(float a, float b) {
+                float m = a - floor( ( a + 0.5 ) / b ) * b;
+                return floor( m + 0.5 );
+            }
+        	uniform sampler2D u_video_tex;
+            uniform sampler2D u_image_tex;
+        	uniform float u_time;
+        	uniform float u_bass;
+        	uniform float u_mid;
+        	uniform float u_trebl; 
+        	uniform float u_0to1;
+        	uniform float u_random;
+            uniform bool  u_bnw;
+            uniform float u_mic_sensitivity;
+            uniform float u_mic_compressor;
+            uniform float u_colorR;
+            uniform float u_colorG;
+            uniform float u_colorB;
+            uniform float u_contrast;
+            uniform float u_brightness;
+            uniform int   u_comp_mode;
+            uniform int   u_blend_mode;
+        	varying vec2 vUv;
+            void main(){
+            	float pi = 3.14159265359;
+            	float time_factor = 20.0;
+            	float time = u_time * time_factor;
+            	float rad = time * pi / 180.;
+
+            	float x = vUv.x;
+            	float y = vUv.y;
+
+            	float trebl = pow(u_trebl, u_mic_compressor) * u_mic_sensitivity;
+            	float mid = pow(u_mid, u_mic_compressor) * u_mic_sensitivity;
+            	float bass = pow(u_bass, u_mic_compressor) * u_mic_sensitivity;  
+
+
+
+            	//-get old tv squeeze effects
+            	float squeeze_input = bass;
+            	// float squeeze_frequency =  (trebl + mid + 1.) * pow((y + squeeze_input)/2., (mid+trebl+bass)) * 360. * pi/180.; //-tightness of zigzag
+                float squeeze_frequency =  (y + squeeze_input) * 360. * pi/180.; //-tightness of zigzag
+            	float squeeze_intensity = squeeze_input; //-width of zigzag
+            	float squeeze =  ( squeeze_input > 0. )? squeeze_intensity * sin(squeeze_frequency + time) : 0.; //-should be ranged between - to + in order to make it zigzag
+
+            	//-get scroll up shift uv
+            	// float uv_scroll_y = y - u_0to1 * bass;
+            	// vec2 uv_scroll = vec2(x, uv_scroll_y);
+
+            	//-get r,g,b shift
+            	float rgb_shift_range = 0.003 + 0.001 * (trebl + mid + bass);
+            	float uv_r_x = x + rgb_shift_range;
+            	float uv_r_y = y + rgb_shift_range;  
+            	vec2 uv_r = vec2(uv_r_x, uv_r_y);
+            	float uv_g_x = x - rgb_shift_range;
+            	float uv_g_y = y - rgb_shift_range;
+            	vec2 uv_g = vec2(uv_g_x, uv_g_y);
+            	float uv_b_x = x + rgb_shift_range;
+            	float uv_b_y = y - rgb_shift_range;
+            	vec2 uv_b = vec2(uv_b_x, uv_b_y);
+
+                //-get interlace lines
+                float interlace_input = mid + trebl + bass;
+                float interlace_frequency = 300.; // 0 ~ 600
+                float interlace_frequency_gap = 2.;
+                float interlace_intensity = .003 * interlace_input;
+                float interlace = ( modulo(vUv.y * interlace_frequency, interlace_frequency_gap) == 0.)? 0. : interlace_intensity;
+
+            	//-get images from texture 
+            	//-add swipe here
+            	vec2 distortion = vec2(interlace + squeeze);
+            	// vec4 cam = texture2D(u_video_tex, vUv + distortion);
+            	vec4 cam_r = texture2D(u_video_tex, uv_r + distortion);
+            	vec4 cam_g = texture2D(u_video_tex, uv_g + distortion);
+            	vec4 cam_b = texture2D(u_video_tex, uv_b + distortion);
+            	// vec4 scroll = texture2D(u_sampler_2d, uv_scroll + distortion);
+                // vec4 image = texture2D(u_image_tex, vUv + distortion);
+                vec4 image_r = texture2D(u_image_tex, uv_r + distortion);
+                vec4 image_g = texture2D(u_image_tex, uv_g + distortion);
+                vec4 image_b = texture2D(u_image_tex, uv_b + distortion);
+
+                //composition
+                vec4 master;
+                vec4 master_r;
+                vec4 master_g;
+                vec4 master_b;
+                if(u_comp_mode == 0){
+                    // master = cam;
+                    master_r = cam_r;
+                    master_g = cam_g;
+                    master_b = cam_b;
+                } else if (u_comp_mode == 1){
+                    // master = image;
+                    master_r = image_r;
+                    master_g = image_g;
+                    master_b = image_b;
+                } else if (u_comp_mode == 2){
+                    if(u_blend_mode == 0){
+                        // master = cam + image;
+                        master_r = cam_r + image_r;
+                        master_g = cam_g + image_g;
+                        master_b = cam_b + image_b;
+                    } else if(u_blend_mode == 1){
+                        // master = cam - image;
+                        master_r = cam_r - image_r;
+                        master_g = cam_g - image_g;
+                        master_b = cam_b - image_b;
+                    } else if(u_blend_mode == 2){
+                        // master = cam * image;
+                        master_r = cam_r * image_r;
+                        master_g = cam_g * image_g;
+                        master_b = cam_b * image_b;
+                    } else if(u_blend_mode == 3){
+                        // master = cam * image + cam * image;
+                        master_r = cam_r * image_r + cam_r * image_r;
+                        master_g = cam_g * image_g + cam_g * image_g;
+                        master_b = cam_b * image_b + cam_b * image_b;
+                    }
+                }
+
+                //-black and white
+                if(u_bnw){
+                    // color.r = color.g = color.b;
+                    // master.r = master.g = master.b;
+                    master_r.r = master_r.g = master_r.b;
+                    master_g.r = master_g.g = master_g.b;
+                    master_b.r = master_b.g = master_b.b;
+                }
+
+                master = vec4(master_r.r, master_g.g, master_b.b, (master_r.a + master_g.a + master_b.a)/3.);
+
+            	float fractal_intensity = trebl + 3.5;
+            	vec3 fractal = (squeeze > .15)? vec3( normalize(master.rgb) * noise(normalize(master.rgb) + rad)) * fractal_intensity : vec3(0.);
+
+            	//-get noise screen
+            	float noise_intensity = bass+mid+trebl;
+            	vec3 noise = rand( vec2(vUv.x , vUv.y * noise_intensity) ) * master.rgb * noise_intensity;
+            	noise.r *= rand(vUv.yy + time * .0001);
+            	noise.g *= rand(vUv.yy + time * .0003);
+            	noise.b *= rand(vUv.yy + time * .0005);
+                noise = (squeeze > .05)? noise: vec3(0.);
+
+      			//-adjust blenidng mode
+      			// vec3 color = master.rgb * master.rgb * .8; 
+                vec3 color = master.rgb; 
+      			//-color adjustment
+                if(!u_bnw){
+                    color.r += u_colorR;
+                    color.g += u_colorG;
+                    color.b += u_colorB;
+                } else {
+                    color.r *= master_r.r * (u_colorR + 1.5);
+                    color.g *= master_g.g * (u_colorG + 1.5);
+                    color.b *= master_b.b * (u_colorB + 1.5);
+                }
+
+      			//-add noise
+      			color += (fractal+noise) * 1.0;
+                //-add interalce color
+                // float interlace_color_intensity = 1.03;
+                // color = (interlace == 0.)? color * interlace_color_intensity : color;
+        	   //-adjust gamma
+               color += u_brightness;
+               if(color.r > 1.) color.r = 1.;
+               if(color.g > 1.) color.g = 1.;
+               if(color.b > 1.) color.b = 1.;
+               vec3 gamma = pow(color, vec3(u_contrast));
+        	   // gl_FragColor = vec4( gamma.rgb, master.a);    
+               gl_FragColor = vec4( gamma.rgb, 1.);    
+            }
+        </script>
+	</head>
+	<body>
+		<script src="js/local/main.js" type="text/javascript"></script>
+	</body>
+</html>

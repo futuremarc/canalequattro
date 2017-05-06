@@ -1,0 +1,135 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+	<title>controller</title>
+	<link href="https://fonts.googleapis.com/css?family=Roboto+Condensed:400" rel="stylesheet">
+	<script src="/socket.io/socket.io.js"></script>
+	<script src="src/jquery-1.9.1.min.js"></script>
+	<script src="src/jquery.form.js"></script> 
+	<style>
+		body{
+			font-family: 'Roboto Condensed', sans-serif;
+			margin: 0;
+			background: #f7f7f7;
+			text-transform: uppercase;
+		}
+		.container{
+			display: inline-block;
+			width:300px;
+			height:100vh;
+			border-right:solid 1px #ddd;
+		}
+		.lable{
+			display: inline-block;
+			width: 150px;
+		}
+		.discription{
+			font-size: 10px;
+			display: inline-block;
+		}
+	</style>
+</head>
+<body>
+	<div class="container">
+		<div class="lable">full screen</div>
+		<div class="discription">click output screen</div>
+
+		<div class="lable">black&white</div>
+		<input type="button" onclick="mode_switcher('bnw')" value="">
+
+		<div class="lable">image mode</div>
+		<input type="button" onclick="mode_switcher('image')" value="">
+
+		<div class="lable">cam mode</div>
+		<input type="button" onclick="mode_switcher('cam')" value="">
+
+		<div class="lable">composition mode</div>
+		<input type="button" onclick="mode_switcher('composition')" value="">
+
+		<div class="lable">composition blending mode</div>
+		<select onchange="blending_mode_switcher(this.options[this.selectedIndex].value)">
+			<option value="add">add</option>
+			<option value="subtract">subtract</option>
+			<option value="multiply">multiply</option>
+			<option value="overlay">overlay</option>
+		</select>
+
+		<form method="post" id="upload_form" action="/upload" enctype="multipart/form-data">
+			<div class="lable">upload image</div> 
+			<input type="file" id="upload" name="pic" accept="image/*" style="display: inline-block;">
+    		<input type="submit"/>
+			<div id="preview_window"><img src="src/logo.png" width="100%"></div>
+		</form>
+
+		<form>
+			<div class="lable">mic sensitivity</div> 
+			<input type="range" oninput="micsensitivity(this.value)" name="mic_sensitivity" min="0.1" max="5.0" step="0.001" value="2.2">
+			<div class="lable">mic compressor</div> 
+			<input type="range" oninput="miccompressor(this.value)" name="mic_compressor" min="1.0" max="10.0" step="0.01" value="2.3">
+			<div class="lable">color r</div> 
+			<input type="range" oninput="colorR(this.value)" name="color_R" min="-1.0" max="1.0" step="0.001">
+			<div class="lable">color g</div> 
+			<input type="range" oninput="colorG(this.value)" name="color_G" min="-1.0" max="1.0" step="0.001">
+			<div class="lable">color b</div> 
+			<input type="range" oninput="colorB(this.value)" name="color_B" min="-1.0" max="1.0" step="0.001">
+			<div class="lable">contrast</div> 
+			<input type="range" oninput="contrast(this.value)" name="_contrast" min=".0" max="5.0" step="0.01" value="1.6">
+			<div class="lable">brightness</div> 
+			<input type="range" oninput="brightness(this.value)" name="_brightness" min="-1.0" max="1.0" step="0.01" value="0.">
+		</form>
+	</div>
+
+	<script type="text/javascript">
+		var socket = io.connect('');
+		var mode_switcher = function(mode){
+			socket.emit('mode', mode);
+		};
+		var blending_mode_switcher = function(mode){
+			socket.emit('blend_mode', mode);
+		};
+		var micsensitivity = function(value){
+			socket.emit('mic_sensitivity', value);
+		};
+		var miccompressor = function(value){
+			socket.emit('mic_compressor', value);
+		};
+		var colorR = function(value){
+			socket.emit('colorR', value);
+		};
+		var colorG = function(value){
+			socket.emit('colorG', value);
+		};
+		var colorB = function(value){
+			socket.emit('colorB', value);
+		};
+		var contrast = function(value){
+			socket.emit('contrast', value);
+		};
+		var brightness = function(value){
+			socket.emit('brightness', value);
+		};
+
+		var create_socket_room = function(_ip){
+		   	socket.emit('room', _ip);
+		};
+
+
+		$('#upload_form').submit(function() {
+	        $(this).ajaxSubmit({
+		            error: function(xhr) { console.log('err, ', xhr); },
+		            success: function(response) { console.log(response); }
+		    });
+		    return false;
+	    });
+
+	    $.getJSON("https://jsonip.com/?callback=?", function (data) {
+	        create_socket_room(data.ip);
+	    });
+
+	    socket.on('img_url', function(data){
+	    	document.getElementById('preview_window').firstChild.src = data;
+		});
+	</script>
+</body>
+</html>

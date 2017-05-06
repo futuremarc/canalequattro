@@ -1,0 +1,23 @@
+{
+  "name": "pt",
+  "description": "",
+  "main": "index.js",
+  "authors": [
+    "marc abbey"
+  ],
+  "license": "ISC",
+  "homepage": "https://github.com/futuremarc/pt",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "jquery": "^3.2.1",
+    "socket.io-client": "^1.7.2",
+    "moment": "^2.18.1",
+    "bootstrap": "^3.3.7"
+  }
+}
