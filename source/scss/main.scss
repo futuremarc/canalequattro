@@ -20,7 +20,7 @@ body{
 
     img{
         width:auto;
-        height:180%;
+        height:100%;
         margin:auto;
         left:0;
         right:0;
@@ -30,6 +30,7 @@ body{
         @media(min-width: 768px){
             margin-left: 50%;
             transform: translateX(-50%);
+            height:180%;
         }
         
     }
