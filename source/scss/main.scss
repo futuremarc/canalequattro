@@ -18,6 +18,8 @@ body{
         -khtml-user-select: none;
         -webkit-user-select: none;
         -o-user-select: none;
+        margin-left: 50%;
+        transform: translateX(-50%);
 
 
     img{
@@ -28,8 +30,7 @@ body{
         right:0;
         position: absolute;
         z-index:10;
-        margin-left: 50%;
-        transform: translateX(-50%);
+        
 
    /*     @media(min-width: 768px){
             
