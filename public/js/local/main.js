@@ -119,7 +119,7 @@ var countdownInterval
 function onVideoLoaded() {
 
     console.log('video loaded')
-    
+
     countdownInterval = setInterval(onInterval, interval);
     getCurrentCountdown(dates)
     this.removeEventListener('loadedmetadata', onVideoLoaded)
@@ -127,7 +127,7 @@ function onVideoLoaded() {
 }
 
 var get_webcam = function() {
-    video = document.createElement('video');
+    video = document.getElementById('tv-screen');
     video.width = ortho_width;
     video.height = ortho_height;
     video.muted = true;
@@ -410,12 +410,12 @@ var render = function() {
     }
 
     if (timer === 0) $clock.removeClass('animate-glitch')
-    else if (timer === 200) $clock.addClass('animate-glitch')
+    else if (timer === 50) $clock.addClass('animate-glitch')
     else if (timer === 400) $clock.removeClass('animate-glitch')
     else if (timer === 600) $clock.addClass('animate-glitch')
     else if (timer === 900) $clock.removeClass('animate-glitch')
 
-    if (timer > 200 && timer < 400) isGlitch = true
+    if (timer > 50 && timer < 400) isGlitch = true
     else if (timer > 400 && timer < 600) isGlitch = false
     else if (timer > 600 && timer < 900) isGlitch = true
     else if (timer > 900 && timer < 1000) isGlitch = false
@@ -426,6 +426,7 @@ var render = function() {
 
         video_mesh_norm.visible = false
         video_mesh.visible = true
+
 
         var tre = mic_input[200] / 255.;
         var mid = mic_input[100] / 255.;

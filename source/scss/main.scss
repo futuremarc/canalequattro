@@ -9,7 +9,7 @@ body{
 		margin: 0;
 		padding: 0;
 		background-color: black;
-        color:white;
+        color:  rgba(255,255,255,.7);
 		font-family: 'VCR_OSD_MONO_1';
         user-select: none;
         -moz-user-select: none;
@@ -45,8 +45,8 @@ body{
 
         .clock{
             
+
             display:none;
-            color:white;
             background:none;
             top:20%;
             right:5%;
@@ -76,7 +76,7 @@ body{
   $steps:20;
   @for $i from 0 through $steps{
     #{percentage($i*(1/$steps))}{
-      clip:rect(random(50)+px,9999px,random(20)+px,0);
+      clip:rect(random(10)+px,9999px,random(10)+px,0);
     }
   }
 }
@@ -86,7 +86,7 @@ body{
   $steps:20;
   @for $i from 0 through $steps{
     #{percentage($i*(1/$steps))}{
-      clip:rect(random(40)+px,9999px,random(50)+px,0);
+      clip:rect(random(10)+px,9999px,random(10)+px,0);
     }
   }
 }
