@@ -127,7 +127,7 @@ function onVideoLoaded() {
 }
 
 var get_webcam = function() {
-    video = document.getElementById('tv-screen');
+    video = document.createElement('video');
     video.width = ortho_width;
     video.height = ortho_height;
     video.muted = true;
