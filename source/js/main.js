@@ -71,10 +71,36 @@ var get_webcam = function() {
     video = document.createElement('video');
     video.width = ortho_width;
     video.height = ortho_height;
-    video.autoplay = true;
-    video.loop = true;
     video.muted = true;
     video.src = 'video/test.mp4'
+    video.load()
+
+    function onVideoLoaded() {
+
+        console.log('video loaded')
+
+        diffTime = getCurrentCountdown(dates)
+
+        if (diffTime > 0) {
+
+            window.$d = $('<div class="days" ></div>').appendTo($clock);
+            window.$h = $('<div class="hours" ></div>').appendTo($clock);
+            window.$m = $('<div class="minutes" ></div>').appendTo($clock);
+            window.$s = $('<div class="seconds" ></div>').appendTo($clock);
+
+            setInterval(countdownInterval, interval);
+
+        }
+
+        this.removeEventListener('loadedmetadata', onVideoLoaded)
+
+    }
+    video.onended = function() {
+        console.log('video done show countdown...')
+        this.currentTime = 0
+        isVideoPlaying = false
+    }
+    video.addEventListener('loadedmetadata', onVideoLoaded)
 
     if (navigator.getUserMedia) {
         navigator.getUserMedia({
@@ -87,8 +113,6 @@ var get_webcam = function() {
                 }
             }
         }, function(stream) {
-            video.src = 'video/test.mp4'
-            video.play();
             setupAudioNodes(stream);
         }, function(err) {
             console.log('failed to get a steram : ', err);
@@ -112,27 +136,84 @@ var init = function() {
     video_tex.minFilter = THREE.LinearFilter //- to use non powers of two image
     image_tex.minFilter = THREE.LinearFilter
 
-     video_mat = new THREE.ShaderMaterial({
-        uniforms:{
-            'u_video_tex': { type: 't', value: video_tex },
-            'u_image_tex': { type: 't', value: image_tex },
-            'u_comp_mode': { type: 'i', value: 0},
-            'u_blend_mode': { type: 'i', value: blending_mode},
-            'u_buffer_2d' : { type: 't', value: null },
-            'u_time': { type: 'f', value: 0},
-            'u_bass': { type: 'f', value: 0 },
-            'u_mid': { type: 'f', value: 0 },
-            'u_treble': { type: 'f', value: 0 },
-            'u_0to1': { type: 'f', value: 0 },
-            'u_random': {type: 'f', value: 0},
-            'u_bnw': {type: 'b', value: false},
-            'u_mic_sensitivity': {type: 'f', value: mic_sensitivity},
-            'u_mic_compressor': {type: 'f', value: mic_compressor},
-            'u_colorR': {type: 'f', value: colorR},
-            'u_colorG': {type: 'f', value: colorG},
-            'u_colorB': {type: 'f', value: colorB},
-            'u_contrast': {type: 'f', value: contrast},
-            'u_brightness': {type: 'f', value: brightness}
+    video_mat = new THREE.ShaderMaterial({
+        uniforms: {
+            'u_video_tex': {
+                type: 't',
+                value: video_tex
+            },
+            'u_image_tex': {
+                type: 't',
+                value: image_tex
+            },
+            'u_comp_mode': {
+                type: 'i',
+                value: 0
+            },
+            'u_blend_mode': {
+                type: 'i',
+                value: blending_mode
+            },
+            'u_buffer_2d': {
+                type: 't',
+                value: null
+            },
+            'u_time': {
+                type: 'f',
+                value: 0
+            },
+            'u_bass': {
+                type: 'f',
+                value: 0
+            },
+            'u_mid': {
+                type: 'f',
+                value: 0
+            },
+            'u_treble': {
+                type: 'f',
+                value: 0
+            },
+            'u_0to1': {
+                type: 'f',
+                value: 0
+            },
+            'u_random': {
+                type: 'f',
+                value: 0
+            },
+            'u_bnw': {
+                type: 'b',
+                value: false
+            },
+            'u_mic_sensitivity': {
+                type: 'f',
+                value: mic_sensitivity
+            },
+            'u_mic_compressor': {
+                type: 'f',
+                value: mic_compressor
+            },
+            'u_colorR': {
+                type: 'f',
+                value: colorR
+            },
+            'u_colorG': {
+                type: 'f',
+                value: colorG
+            },
+            'u_colorB': {
+                type: 'f',
+                value: colorB
+            },
+            'u_contrast': {
+                type: 'f',
+                value: contrast
+            },
+            'u_brightness': {
+                type: 'f',
+                value: brightness
+            }
         },
         vertexShader: document.getElementById('video_vert').textContent,
         fragmentShader: document.getElementById('video_frag').textContent,
@@ -180,6 +261,7 @@ var init = function() {
 videos = {}
 
 var isGlitch = false
+window.isVideoPlaying = false
 
 var render = function() {
     camera.lookAt(scene.position);
@@ -189,6 +271,13 @@ var render = function() {
         video_tex_norm.needsUpdate = true;
     } //- live input has to be updated to refresh frames
 
+    if (!isVideoPlaying) {
+        video.currentTime = 0
+        video_mesh_norm.visible = false
+        video_mesh.visible = false
+
+    }
+
     if (timer > 200 && timer < 400) isGlitch = true
     else if (timer > 400 && timer < 600) isGlitch = false
     else if (timer > 600 && timer < 900) isGlitch = true
@@ -197,7 +286,7 @@ var render = function() {
 
     if (isGlitch) {
 
-        
+
         video_mesh_norm.visible = false
         video_mesh.visible = true
 
@@ -205,7 +294,7 @@ var render = function() {
         var mid = mic_input[100] / 255.;
         var bass = mic_input[2] / 255.;
 
-        console.log('tre : ', tre, ', mid : , ', mid, ', bass : ', bass);
+        //console.log('tre : ', tre, ', mid : , ', mid, ', bass : ', bass);
 
         video_mat.uniforms['u_video_tex'].value = video_tex;
         video_mat.uniforms['u_image_tex'].value = image_tex;
