@@ -247,92 +247,7 @@
             }
         </script>
 
-        <script>
-            
-            window.onload = function(e){
 
-                window.dates = ['6-5-2017 23:43:00 EDT', '7-5-2017 02:32:00 EDT','7-5-2017 02:32:30 EDT','7-5-2017 01:33:00 EDT', '9-5-2017 07:00:00 EDT','9-5-2017 14:00:00 EDT','9-5-2017 20:00:00 EDT','9-5-2017 23:00:00 EDT']
-                window.$clock = $('#clock');
-                window.interval, window.duration, window.currentTime, window.eventTime;
-
-                window.getCurrentCountdown = function(dates){
-
-                    var currentCountdown
-
-                    for (var i = 0; i < dates.length; i++){
-
-                        eventTime = moment(dates[i], 'DD-MM-YYYY HH:mm:ss').unix(),
-                        currentTime = moment().unix(),
-                        diffTime = eventTime - currentTime,
-                        duration = moment.duration(diffTime * 1000, 'milliseconds'),
-                        interval = 1000;
-
-                        console.log('diffTime', diffTime, -video.duration, diffTime < 0 && diffTime > -video.duration)
-
-                        if (diffTime < 0 && diffTime > - video.duration){
-
-                            console.log('video is already playing, play from', diffTime * -1)
-                            window.isVideoPlaying = true
-                            video.currentTime = diffTime * -1
-                            video.play()
-                            break
-
-                        }
-
-                        if (diffTime > 0){
-                            currentCountdown = diffTime
-                            console.log('currentCountdown', currentCountdown)
-                            break
-                        }
-
-                    }
-        
-                    
-                    return currentCountdown
-                    
-                }
-
-                window.countdownInterval = function(){
-
-                    duration = moment.duration(duration.asMilliseconds() - interval, 'milliseconds');
-                    var d = moment.duration(duration).days(),
-                        h = moment.duration(duration).hours(),
-                        m = moment.duration(duration).minutes(),
-                        s = moment.duration(duration).seconds();
-
-                    d = $.trim(d).length === 1 ? '0' + d : d;
-                    h = $.trim(h).length === 1 ? '0' + h : h;
-                    m = $.trim(m).length === 1 ? '0' + m : m;
-                    s = $.trim(s).length === 1 ? '0' + s : s;
-
-                    // show how many hours, minutes and seconds are left
-                    $d.text(d);
-                    $h.text(h);
-                    $m.text(m);
-                    $s.text(s);
-
-
-                    if (d < 1 && h < 1 && m < 1 && s < 1){
-                        console.log('play video from beginning...')
-                        window.isVideoPlaying = true
-                        video.currentTime = 0
-
-                        video.src = 'video/test.mp4'
-                        video.play()
-                        clearInterval(countdownInterval)
-                        getCurrentCountdown(dates)
-                        return
-                    }
-
-                    
-                }
-
-               
-
-            };
-
-
-        </script>
         <style type="text/css">
 
         @font-face {
@@ -357,8 +272,8 @@
         </style>
 	</head>
 	<body>
-		<script src="js/local/main.js" type="text/javascript"></script>
         <div id="clock"></div>
+		<script src="js/local/main.js" type="text/javascript"></script>
 	</body>
 </html>
 

@@ -31,6 +31,10 @@ var mic_sensitivity = 2.2,
     contrast = 1.6,
     brightness = 0.
 
+var dates = ['7-5-2017 12:28:40 EDT', '7-5-2017 12:29:00 EDT', '7-5-2017 12:29:30 EDT', '9-5-2017 07:00:00 EDT', '9-5-2017 14:00:00 EDT', '9-5-2017 20:00:00 EDT', '9-5-2017 23:00:00 EDT'],
+    interval = 1000,
+    currentDuration
+
 var window_resize = function() {
     renderer.setSize(window.innerWidth, window.innerHeight);
     camera.aspect = window.innerWidth / window.innerHeight;
@@ -67,6 +71,58 @@ var get_mic_input = function() {
     //}
 };
 
+var $clock = $('#clock')
+var $d = $('<div class="days" ></div>').appendTo($clock);
+var $h = $('<div class="hours" ></div>').appendTo($clock);
+var $m = $('<div class="minutes" ></div>').appendTo($clock);
+var $s = $('<div class="seconds" ></div>').appendTo($clock);
+
+function onInterval() {
+
+    currentDuration = moment.duration(currentDuration.asMilliseconds() - interval, 'milliseconds');
+    var d = moment.duration(currentDuration).days(),
+        h = moment.duration(currentDuration).hours(),
+        m = moment.duration(currentDuration).minutes(),
+        s = moment.duration(currentDuration).seconds();
+
+    d = $.trim(d).length === 1 ? '0' + d : d;
+    h = $.trim(h).length === 1 ? '0' + h : h;
+    m = $.trim(m).length === 1 ? '0' + m : m;
+    s = $.trim(s).length === 1 ? '0' + s : s;
+
+    // show how many hours, minutes and seconds are left
+    $d.text(d);
+    $h.text(h);
+    $m.text(m);
+    $s.text(s);
+
+
+    if (d < 1 && h < 1 && m < 1 && s < 1 && !isVideoPlaying) {
+        $clock.hide()
+        console.log('play video from beginning...')
+        window.isVideoPlaying = true
+        video.currentTime = 0
+        clearInterval(countdownInterval);
+        video.play()
+        return
+    }
+
+
+}
+
+var countdownInterval
+
+function onVideoLoaded() {
+
+    console.log('video loaded')
+
+    countdownInterval = setInterval(onInterval, interval);
+    getCurrentCountdown(dates)
+
+    this.removeEventListener('loadedmetadata', onVideoLoaded)
+
+}
+
 var get_webcam = function() {
     video = document.createElement('video');
     video.width = ortho_width;
@@ -75,31 +131,15 @@ var get_webcam = function() {
     video.src = 'video/test.mp4'
     video.load()
 
-    function onVideoLoaded() {
-
-        console.log('video loaded')
-
-        diffTime = getCurrentCountdown(dates)
-
-        if (diffTime > 0) {
-
-            window.$d = $('<div class="days" ></div>').appendTo($clock);
-            window.$h = $('<div class="hours" ></div>').appendTo($clock);
-            window.$m = $('<div class="minutes" ></div>').appendTo($clock);
-            window.$s = $('<div class="seconds" ></div>').appendTo($clock);
-
-            setInterval(countdownInterval, interval);
-
-        }
-
-        this.removeEventListener('loadedmetadata', onVideoLoaded)
-
-    }
     video.onended = function() {
         console.log('video done show countdown...')
+        $clock.show()
         this.currentTime = 0
+        this.addEventListener('loadedmetadata', onVideoLoaded)
+        this.load()
         isVideoPlaying = false
     }
+
     video.addEventListener('loadedmetadata', onVideoLoaded)
 
     if (navigator.getUserMedia) {
@@ -121,6 +161,47 @@ var get_webcam = function() {
         console.log('user media is not supported');
     }
 };
+
+
+function getCurrentCountdown(dates) {
+
+    var currentCountdown
+
+    for (var i = 0; i < dates.length; i++) {
+
+        var eventTime = moment(dates[i], 'DD-MM-YYYY HH:mm:ss').unix();
+        var currentTime = moment().unix();
+        var diffTime = eventTime - currentTime;
+        var duration = moment.duration(diffTime * 1000, 'milliseconds');
+
+        console.log('diffTime', diffTime, 'duration', duration.asMilliseconds(), 'video duration', video.duration, diffTime < 0 && diffTime > -video.duration)
+
+        if (diffTime < 0 && diffTime > - video.duration + 1) {
+
+            console.log('video is already playing, play from', diffTime * -1)
+            $clock.hide()
+            currentCountdown = diffTime
+            currentDuration = duration
+            window.isVideoPlaying = true
+            video.currentTime = diffTime * -1
+            clearInterval(countdownInterval);
+            video.play()
+            break
+        }
+
+        if (diffTime > 0) {
+            currentCountdown = diffTime
+            currentDuration = duration
+            console.log('currentCountdown', currentCountdown)
+            break
+        }
+
+    }
+
+
+    return currentCountdown
+
+}
 
 var init = function() {
     scene = new THREE.Scene();
@@ -258,10 +339,9 @@ var init = function() {
 
 };
 
-videos = {}
-
-var isGlitch = false
-window.isVideoPlaying = false
+var videos = {},
+    isGlitch = false,
+    isVideoPlaying = false
 
 var render = function() {
     camera.lookAt(scene.position);
@@ -272,10 +352,8 @@ var render = function() {
     } //- live input has to be updated to refresh frames
 
     if (!isVideoPlaying) {
-        video.currentTime = 0
         video_mesh_norm.visible = false
         video_mesh.visible = false
-
     }
 
     if (timer > 200 && timer < 400) isGlitch = true
