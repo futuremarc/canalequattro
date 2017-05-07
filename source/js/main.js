@@ -20,7 +20,7 @@ var socket = io.connect('http://localhost:5050', {
 
 var is_bnw = false,
     is_fullscreen = false;
-var the_mode = 'cam',
+var the_mode = 'image',
     the_mode_index = 0,
     blending_mode = 0;
 var mic_sensitivity = 2.2,
@@ -31,13 +31,14 @@ var mic_sensitivity = 2.2,
     contrast = 1.6,
     brightness = 0.
 
-var dates = ['7-5-2017 12:28:40 EDT', '7-5-2017 12:29:00 EDT', '7-5-2017 12:29:30 EDT', '9-5-2017 07:00:00 EDT', '9-5-2017 14:00:00 EDT', '9-5-2017 20:00:00 EDT', '9-5-2017 23:00:00 EDT'],
+var container
+var dates = ['7-5-2017 13:43:00 EDT', '7-5-2017 13:43:30 EDT', '7-5-2017 12:44:00 EDT', '9-5-2017 07:00:00 EDT', '9-5-2017 14:00:00 EDT', '9-5-2017 20:00:00 EDT', '9-5-2017 23:00:00 EDT'],
     interval = 1000,
     currentDuration
 
 var window_resize = function() {
-    renderer.setSize(window.innerWidth, window.innerHeight);
-    camera.aspect = window.innerWidth / window.innerHeight;
+    renderer.setSize(container.offsetWidth, container.offsetHeight);
+    camera.aspect = container.offsetWidth / container.offsetHeight;
     camera.updateProjectionMatrix();
 };
 
@@ -99,7 +100,8 @@ function onInterval() {
 
     if (d < 1 && h < 1 && m < 1 && s < 1 && !isVideoPlaying) {
         $clock.hide()
-        console.log('play video from beginning...')
+        console.log('video play from beginning...')
+        videoMode()
         window.isVideoPlaying = true
         video.currentTime = 0
         clearInterval(countdownInterval);
@@ -118,7 +120,6 @@ function onVideoLoaded() {
 
     countdownInterval = setInterval(onInterval, interval);
     getCurrentCountdown(dates)
-
     this.removeEventListener('loadedmetadata', onVideoLoaded)
 
 }
@@ -133,6 +134,8 @@ var get_webcam = function() {
 
     video.onended = function() {
         console.log('video done show countdown...')
+
+        imageMode()
         $clock.show()
         this.currentTime = 0
         this.addEventListener('loadedmetadata', onVideoLoaded)
@@ -176,9 +179,10 @@ function getCurrentCountdown(dates) {
 
         console.log('diffTime', diffTime, 'duration', duration.asMilliseconds(), 'video duration', video.duration, diffTime < 0 && diffTime > -video.duration)
 
-        if (diffTime < 0 && diffTime > - video.duration + 1) {
+        if (diffTime < 0 && diffTime > -video.duration + 1) {
 
-            console.log('video is already playing, play from', diffTime * -1)
+            console.log('video play from', diffTime * -1)
+            videoMode()
             $clock.hide()
             currentCountdown = diffTime
             currentDuration = duration
@@ -204,16 +208,32 @@ function getCurrentCountdown(dates) {
 }
 
 var init = function() {
+
     scene = new THREE.Scene();
     camera = new THREE.OrthographicCamera(ortho_width / -2, ortho_width / 2, ortho_height / 2, ortho_height / -2, ortho_near, ortho_far);
     renderer = new THREE.WebGLRenderer();
+    container = document.getElementById('canvas-container');
     renderer.setPixelRatio(window.devicePixelRatio);
-    renderer.setSize(window.innerWidth, window.innerHeight);
+    renderer.setSize(container.offsetWidth, container.offsetHeight);
     // renderer.setSize( ortho_width, ortho_height );
-    container = document.createElement('div');
 
     video_tex = new THREE.Texture(video);
-    image_tex = new THREE.TextureLoader().load('img/test.png');
+
+    var src = 'img/tv-countdown.png'
+
+
+    image_tex = new THREE.TextureLoader().load(src);
+
+    var image = new Image();
+    image.src = src;
+
+    // image.onload = function() {
+    //     image_tex = new THREE.Texture();
+    //     image_tex.image = image;
+    //     image_tex.needsUpdate = true;
+    //     image_tex.minFilter = THREE.LinearFilter
+    // }
+
     video_tex.minFilter = THREE.LinearFilter //- to use non powers of two image
     image_tex.minFilter = THREE.LinearFilter
 
@@ -309,12 +329,8 @@ var init = function() {
 
     videos.glitch = video_mesh
 
-
-    video_tex_norm = new THREE.Texture(video);
-    video_tex_norm.minFilter = THREE.LinearFilter
-
     video_mat_norm = new THREE.MeshBasicMaterial({
-        map: video_tex_norm,
+        map: image_tex,
         color: 0xffffff,
         transparent: true,
         opacity: .93,
@@ -335,6 +351,8 @@ var init = function() {
     container.appendChild(renderer.domElement);
     document.body.appendChild(container);
 
+    imageMode()
+
     animate();
 
 };
@@ -343,13 +361,29 @@ var videos = {},
     isGlitch = false,
     isVideoPlaying = false
 
+
+function videoMode(){
+
+    video_mat.uniforms['u_comp_mode'].value = 0
+    video_mesh_norm.material.map = video_tex
+    video_tex.needsUpdate = true
+    image_tex.needsUpdate = true
+
+}
+
+function imageMode(){
+    video_mat.uniforms['u_comp_mode'].value = 1;
+    video_mesh_norm.material.map = image_tex
+    video_tex.needsUpdate = true
+    image_tex.needsUpdate = true
+}
 var render = function() {
     camera.lookAt(scene.position);
 
     if (video.readyState === video.HAVE_ENOUGH_DATA) {
         video_tex.needsUpdate = true;
-        video_tex_norm.needsUpdate = true;
-    } //- live input has to be updated to refresh frames
+        image_tex.needsUpdate = true
+    } 
 
     if (!isVideoPlaying) {
         video_mesh_norm.visible = false
@@ -377,10 +411,12 @@ var render = function() {
         video_mat.uniforms['u_video_tex'].value = video_tex;
         video_mat.uniforms['u_image_tex'].value = image_tex;
 
-        if (the_mode === 'cam')
-            video_mat.uniforms['u_comp_mode'].value = 0;
-        else if (the_mode === 'image')
-            video_mat.uniforms['u_comp_mode'].value = 1;
+        if (the_mode === 'cam'){
+            
+        }
+        else if (the_mode === 'image'){
+
+        }
         else if (the_mode === 'composition')
             video_mat.uniforms['u_comp_mode'].value = 2;
 
