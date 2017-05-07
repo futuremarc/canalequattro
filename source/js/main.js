@@ -192,7 +192,8 @@ var render = function() {
     if (timer > 200 && timer < 400) isGlitch = true
     else if (timer > 400 && timer < 600) isGlitch = false
     else if (timer > 600 && timer < 900) isGlitch = true
-    else if (timer > 900) isGlitch = false
+    else if (timer > 900 && timer < 1000) isGlitch = false
+    else if (timer > 1000) timer = 0
 
     if (isGlitch) {
 

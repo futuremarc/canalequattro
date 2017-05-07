@@ -251,14 +251,38 @@
             
             window.onload = function(e){
 
-                var $clock = $('#clock'),
-                    eventTime = moment('9-5-2017 07:00:00 EDT', 'DD-MM-YYYY HH:mm:ss').unix(),
+                var dates = ['6-5-2017 23:30:00 EDT','6-5-2017 23:43:00 EDT', '6-5-2017 23:45:00 EDT', '9-5-2017 07:00:00 EDT','9-5-2017 14:00:00 EDT','9-5-2017 20:00:00 EDT','9-5-2017 23:00:00 EDT']
+                var $clock = $('#clock');
+                var interval, duration, currentTime, eventTime
+
+                function getCurrentCountdown(dates){
+
+                    var currentCountdown
+
+                    for (var i = 0; i < dates.length; i++){
+
+                    eventTime = moment(dates[i], 'DD-MM-YYYY HH:mm:ss').unix(),
                     currentTime = moment().unix(),
                     diffTime = eventTime - currentTime,
                     duration = moment.duration(diffTime * 1000, 'milliseconds'),
                     interval = 1000;
 
                     console.log('DURATION', duration.milliseconds())
+
+                        if (diffTime > 0){
+                            currentCountdown = diffTime
+                            console.log('current countdown', currentCountdown)
+                            break
+                        }
+
+                    }
+        
+                    
+                    return currentCountdown
+                    
+                }
+
+                diffTime = getCurrentCountdown(dates)
 
                 // if time to countdown
                 if(diffTime > 0) {
