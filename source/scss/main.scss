@@ -13,28 +13,27 @@ body{
 		font-family: 'VCR_OSD_MONO_1';
         user-select: none;
         overflow:hidden;
-        overflow-x:hidden;
         -moz-user-select: none;
         -khtml-user-select: none;
         -webkit-user-select: none;
         -o-user-select: none;
 
 
-
     img{
-        width:100%;
-        height:auto;
+        width:auto;
+        height:100%;
         margin:auto;
         left:0;
         right:0;
         position: absolute;
         z-index:10;
-        
+        margin-left: 50%;
+        transform: translateX(-50%);
 
-   /*     @media(min-width: 768px){
+        @media(min-width: 768px){
             
             height: 180%;
-        }*/
+        }
         
 
     }
@@ -48,11 +47,12 @@ body{
         right:0;
         bottom:0;
         top:0;
-/*
+        
+
         @media(min-width: 768px){
             top:65%;
         }
-*/
+
         position: absolute;
         z-index:9;
 
@@ -64,28 +64,28 @@ body{
             background:none;
             top:20%;
             right:5%;
-            font-size:1.5vw;
+            font-size:1.5vh;
             
-/*
+
             @media(min-width: 768px){
                 font-size:3.5vh;
             }
-*/
+
 
             display:inline-block;
             position:absolute;
 
             div{
                 display:inline;
-                margin-left:1vw;
-                margin-right:1vw;
+                margin-left:1vh;
+                margin-right:1vh;
 
-/*
-            @media(min-width: 768px){
-                margin-left:1.38vh;
-                margin-right:1.38vh;
-            }
-*/
+
+                @media(min-width: 768px){
+                    margin-left:1.38vh;
+                    margin-right:1.38vh;
+                }
+
               
             }
 

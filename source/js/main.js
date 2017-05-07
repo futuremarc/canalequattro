@@ -118,6 +118,8 @@ var countdownInterval
 
 function onVideoLoaded() {
 
+
+
     console.log('video loaded')
 
     countdownInterval = setInterval(onInterval, interval);
@@ -211,8 +213,21 @@ function getCurrentCountdown(dates) {
 
 var imgContainer = $('img')[0]
 
+var outer = window.innerWidth
+var inner = imgContainer.offsetWidth;
+console.log(inner, outer);
+$(document.body).scrollLeft((inner - outer) / 2)
+
+var outer = window.innerHeight
+var inner = imgContainer.offsetHeight;
+console.log(inner, outer);
+$(document.body).scrollTop((inner - outer) / 2)
+
+
 
 var init = function() {
+
+
 
     scene = new THREE.Scene();
     camera = new THREE.OrthographicCamera(ortho_width / -2, ortho_width / 2, ortho_height / 2, ortho_height / -2, ortho_near, ortho_far);
@@ -229,7 +244,7 @@ var init = function() {
     renderer.setPixelRatio(window.devicePixelRatio);
     renderer.setSize(container.offsetWidth, container.offsetHeight);
     // renderer.setSize( ortho_width, ortho_height );
-    
+
 
     container.appendChild(renderer.domElement);
     $clock = $('<div class="clock"></div>').appendTo(container)
