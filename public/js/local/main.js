@@ -1,3 +1,5 @@
+$(document).ready(function() {})
+
 navigator.getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia;
 
 var audioCtx = new(window.AudioContext || window.webkitAudioContext || window.mozAudioContext || window.msAudioContext)();
@@ -37,6 +39,11 @@ var dates = ['7-5-2017 13:43:00 EDT', '7-5-2017 13:43:30 EDT', '7-5-2017 12:44:0
     currentDuration
 
 var window_resize = function() {
+
+    var imgConWidth = imgContainer.offsetWidth
+    var rendererWidth = imgConWidth / 2.5
+
+    container.style.width = rendererWidth + 'px'
     renderer.setSize(container.offsetWidth, container.offsetHeight);
     camera.aspect = container.offsetWidth / container.offsetHeight;
     camera.updateProjectionMatrix();
@@ -72,11 +79,6 @@ var get_mic_input = function() {
     //}
 };
 
-var $clock = $('#clock')
-var $d = $('<div class="days" ></div>').appendTo($clock);
-var $h = $('<div class="hours" ></div>').appendTo($clock);
-var $m = $('<div class="minutes" ></div>').appendTo($clock);
-var $s = $('<div class="seconds" ></div>').appendTo($clock);
 
 function onInterval() {
 
@@ -117,7 +119,7 @@ var countdownInterval
 function onVideoLoaded() {
 
     console.log('video loaded')
-
+    
     countdownInterval = setInterval(onInterval, interval);
     getCurrentCountdown(dates)
     this.removeEventListener('loadedmetadata', onVideoLoaded)
@@ -207,20 +209,41 @@ function getCurrentCountdown(dates) {
 
 }
 
+var imgContainer = $('img')[0]
+
+
 var init = function() {
 
     scene = new THREE.Scene();
     camera = new THREE.OrthographicCamera(ortho_width / -2, ortho_width / 2, ortho_height / 2, ortho_height / -2, ortho_near, ortho_far);
     renderer = new THREE.WebGLRenderer();
-    container = document.getElementById('canvas-container');
+    renderer.setClearColor(0x000000, 0);
+    container = document.getElementById('canale-container');
+
+
+    var imgConWidth = imgContainer.offsetWidth
+    var rendererWidth = imgConWidth / 2.5
+    container.style.width = rendererWidth + 'px'
+
+
     renderer.setPixelRatio(window.devicePixelRatio);
     renderer.setSize(container.offsetWidth, container.offsetHeight);
     // renderer.setSize( ortho_width, ortho_height );
+    
+
+    container.appendChild(renderer.domElement);
+    $clock = $('<div class="clock"></div>').appendTo(container)
+
+
+    $d = $('<div>00</div>').appendTo($clock); //use spaces as placeholders for numbers
+    $h = $('<div>00</div>').appendTo($clock);
+    $m = $('<div>00</div>').appendTo($clock);
+    $s = $('<div>00</div>').appendTo($clock);
+    document.body.appendChild(container);
 
     video_tex = new THREE.Texture(video);
 
     var src = 'img/tv-countdown.png'
-
 
     image_tex = new THREE.TextureLoader().load(src);
 
@@ -347,10 +370,6 @@ var init = function() {
 
     scene.add(camera);
 
-
-    container.appendChild(renderer.domElement);
-    document.body.appendChild(container);
-
     imageMode()
 
     animate();
@@ -362,7 +381,7 @@ var videos = {},
     isVideoPlaying = false
 
 
-function videoMode(){
+function videoMode() {
 
     video_mat.uniforms['u_comp_mode'].value = 0
     video_mesh_norm.material.map = video_tex
@@ -371,7 +390,7 @@ function videoMode(){
 
 }
 
-function imageMode(){
+function imageMode() {
     video_mat.uniforms['u_comp_mode'].value = 1;
     video_mesh_norm.material.map = image_tex
     video_tex.needsUpdate = true
@@ -383,12 +402,18 @@ var render = function() {
     if (video.readyState === video.HAVE_ENOUGH_DATA) {
         video_tex.needsUpdate = true;
         image_tex.needsUpdate = true
-    } 
+    }
 
     if (!isVideoPlaying) {
         video_mesh_norm.visible = false
         video_mesh.visible = false
     }
+
+    if (timer === 0) $clock.removeClass('animate-glitch')
+    else if (timer === 200) $clock.addClass('animate-glitch')
+    else if (timer === 400) $clock.removeClass('animate-glitch')
+    else if (timer === 600) $clock.addClass('animate-glitch')
+    else if (timer === 900) $clock.removeClass('animate-glitch')
 
     if (timer > 200 && timer < 400) isGlitch = true
     else if (timer > 400 && timer < 600) isGlitch = false
@@ -411,13 +436,11 @@ var render = function() {
         video_mat.uniforms['u_video_tex'].value = video_tex;
         video_mat.uniforms['u_image_tex'].value = image_tex;
 
-        if (the_mode === 'cam'){
-            
-        }
-        else if (the_mode === 'image'){
+        if (the_mode === 'cam') {
 
-        }
-        else if (the_mode === 'composition')
+        } else if (the_mode === 'image') {
+
+        } else if (the_mode === 'composition')
             video_mat.uniforms['u_comp_mode'].value = 2;
 
         video_mat.uniforms['u_blend_mode'].value = blending_mode;

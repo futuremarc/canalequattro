@@ -1,0 +1,169 @@
+
+
+@font-face {
+  font-family: 'VCR_OSD_MONO_1';
+  src: url('../../font/VCR_OSD_MONO_1.001.ttf') format('truetype');
+}
+
+body{
+		margin: 0;
+		padding: 0;
+		background-color: black;
+        color:white;
+		font-family: 'VCR_OSD_MONO_1';
+        user-select: none;
+        -moz-user-select: none;
+        -khtml-user-select: none;
+        -webkit-user-select: none;
+        -o-user-select: none;
+
+
+    img{
+        width:auto;
+        height:180%;
+        margin:auto;
+        left:0;
+        right:0;
+        position: absolute;
+        z-index:10;
+        margin-left: 50%;
+        transform: translateX(-50%);
+    }
+
+
+    #canale-container{
+        width:40%;
+        height:50%;
+        margin:auto;
+        left:0;
+        right:0;
+        bottom:0;
+        top:65%;
+        position: absolute;
+        z-index:9;
+
+
+        .clock{
+            
+            display:none;
+            color:white;
+            background:none;
+            top:20%;
+            right:5%;
+            font-size:3.5vh;
+            display:inline-block;
+            position:absolute;
+
+            div{
+                display:inline;
+                margin-left:1.38vh;
+                margin-right:1.38vh;
+            }
+
+        }
+
+
+
+    }
+
+
+}
+
+
+
+
+@keyframes noiseAnim{
+  $steps:20;
+  @for $i from 0 through $steps{
+    #{percentage($i*(1/$steps))}{
+      clip:rect(random(50)+px,9999px,random(20)+px,0);
+    }
+  }
+}
+
+
+@keyframes noiseAnim2{
+  $steps:20;
+  @for $i from 0 through $steps{
+    #{percentage($i*(1/$steps))}{
+      clip:rect(random(40)+px,9999px,random(50)+px,0);
+    }
+  }
+}
+
+.animate-glitch{
+        
+    clip:rect(0,900px,0,0); 
+    animation:noiseAnim 2s infinite linear alternate-reverse;
+
+}
+
+.animate-flicker {
+    opacity:1;  
+    animation: flickerAnim 1s infinite;
+}
+
+@keyframes flickerAnim {
+  0%   { opacity:1; }
+  50%  { opacity:0; }
+  100% { opacity:1; }
+}
+@-o-keyframes flickerAnim{
+  0%   { opacity:1; }
+  50%  { opacity:0; }
+  100% { opacity:1; }
+}
+@-moz-keyframes flickerAnim{
+  0%   { opacity:1; }
+  50%  { opacity:0; }
+  100% { opacity:1; }
+}
+@-webkit-keyframes flickerAnim{
+  0%   { opacity:1; }
+  50%  { opacity:0; }
+  100% { opacity:1; }
+}
+.animate-flicker {
+   -webkit-animation: flickerAnim 1s infinite;
+   -moz-animation: flickerAnim 1s infinite;
+   -o-animation: flickerAnim 1s infinite;
+    animation: flickerAnim 1s infinite;
+}
+
+/*
+
+.clock:after{
+    content:attr(data-text);
+    position:absolute;
+    left:2px;
+    text-shadow:-1px 0 red;
+    top:0;
+    color:white;
+    background:none;
+    overflow:hidden;
+    clip:rect(0,900px,0,0); 
+    animation:noiseAnim 2s infinite linear alternate-reverse;
+    font-size:1.5vh;
+    display:inline;
+    margin-left:1vh;
+    margin-right:1vh;
+
+}
+.clock:before{
+  content:attr(data-text);
+  position:absolute;
+  left:-2px;
+  text-shadow:1px 0 blue; 
+  top:0;
+  color:white;
+  background:none;
+  overflow:hidden;
+  clip:rect(0,900px,0,0); 
+  animation:noiseAnim2 3s infinite linear alternate-reverse;
+  display:inline;
+  margin-left:1vh;
+  margin-right:1vh;
+  font-size:1.5vh;
+}
+
+*/
