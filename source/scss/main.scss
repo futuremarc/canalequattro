@@ -22,15 +22,13 @@ body{
 
 
     img{
-        width:auto;
-        height:100%;
+        width:100%;
+        height:auto;
         margin:auto;
         left:0;
         right:0;
         position: absolute;
         z-index:10;
-        margin-left: 50%;
-        transform: translateX(-50%);
         
 
    /*     @media(min-width: 768px){
@@ -50,9 +48,6 @@ body{
         right:0;
         bottom:0;
         top:0;
-        margin-left: 50%;
-        transform: translateX(-50%);
-        
 /*
         @media(min-width: 768px){
             top:65%;
@@ -69,7 +64,7 @@ body{
             background:none;
             top:20%;
             right:5%;
-            font-size:1.5vh;
+            font-size:1.5vw;
             
 /*
             @media(min-width: 768px){
@@ -82,8 +77,8 @@ body{
 
             div{
                 display:inline;
-                margin-left:1vh;
-                margin-right:1vh;
+                margin-left:1vw;
+                margin-right:1vw;
 
 /*
             @media(min-width: 768px){
