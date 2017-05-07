@@ -28,10 +28,10 @@ body{
         position: absolute;
         z-index:10;
         margin-left: 50%;
+
         transform: translateX(-50%);
 
         @media(min-width: 768px){
-            
             height: 180%;
         }
         
@@ -51,6 +51,7 @@ body{
 
         @media(min-width: 768px){
             top:65%;
+            height:50%;
         }
 
         position: absolute;
