@@ -13,16 +13,6 @@
      width: 5px;
  }
 
- html {
-  @media only screen and (orientation: portrait) and (max-width: 555px) {
-    transform: rotate(90deg);
-    width: calc(155%);
-    .content {
-      width: calc(155%);
-    }
-  }
-}
-
 body{
 		margin: 0;
 		padding: 0;
@@ -110,9 +100,7 @@ body{
 */
     
         .clock{
-            
 
-            display:none;
             background:none;
             top:20%;
             right:5%;

@@ -394,6 +394,7 @@ function onClick(){
 
     isPowered = !isPowered
     if (isPowered){
+
         timer = 0
         $('#tv-power').show()
         $('#tv-standby').hide()
@@ -401,7 +402,6 @@ function onClick(){
         $('#tv-reflection').show()
         $('#tv-glow').show()
         $('canvas').removeClass('transparent')
-        $clock.removeClass('animate-glitch')
 
     }else{
         $('#tv-power').hide()
@@ -410,7 +410,6 @@ function onClick(){
         $('#tv-reflection').hide()
         $('#tv-glow').hide()
         $('canvas').addClass('transparent')
-        $clock.addClass('animate-glitch')
     }
     adjustViewspace()
 }
@@ -442,12 +441,12 @@ var render = function() {
 
     if (timer === 0) $clock.removeClass('animate-glitch')
     else if (timer === 50) $clock.addClass('animate-glitch')
-    else if (timer === 400) $clock.removeClass('animate-glitch')
+    else if (timer === 300) $clock.removeClass('animate-glitch')
     else if (timer === 600) $clock.addClass('animate-glitch')
     else if (timer === 900) $clock.removeClass('animate-glitch')
 
-    if (timer > 50 && timer < 400) isGlitch = true
-    else if (timer > 400 && timer < 600) isGlitch = false
+    if (timer > 50 && timer < 300) isGlitch = true
+    else if (timer > 300 && timer < 600) isGlitch = false
     else if (timer > 600 && timer < 900) isGlitch = true
     else if (timer > 900 && timer < 1000) isGlitch = false
     else if (timer > 1000) timer = 0
