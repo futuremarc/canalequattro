@@ -36,17 +36,13 @@ body{
         right:0;
         position: absolute;
         
-    /*    @media(min-width: 768px){
-            height: 180%;
+        @media(min-width: 768px){
             margin-left: 50%;
             transform: translateX(-50%);
         }
-*/
 
-        @media(max-width: 768px){
-            transform: translateX(-25%);
-        }
 
+ 
         
 
     }
