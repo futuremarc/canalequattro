@@ -38,12 +38,12 @@ var dates = ['7-5-2017 13:43:00 EDT', '7-5-2017 13:43:30 EDT', '7-5-2017 12:44:0
     interval = 1000,
     currentDuration
 
+var rendererToImageRatio = 2.1
+
 var adjustViewspace = function() {
 
-    scrollPageToCenter()
-
     var imgConWidth = imgContainer.offsetWidth
-    var rendererWidth = imgConWidth / 2.5
+    var rendererWidth = imgConWidth / rendererToImageRatio
 
     container.style.width = rendererWidth + 'px'
     renderer.setSize(container.offsetWidth, container.offsetHeight);
@@ -75,10 +75,6 @@ var setupAudioNodes = function(stream) {
 
 var get_mic_input = function() {
     analyserNode.getByteFrequencyData(mic_input);
-    //for(var i = 0; i < mic_input.length; i++){
-    //if(mic_input[i] > 100)
-    //console.log(i, "' ",mic_input[i]);
-    //}
 };
 
 
@@ -105,7 +101,7 @@ function onInterval() {
     if (d < 1 && h < 1 && m < 1 && s < 1 && !isVideoPlaying) {
         $clock.hide()
         console.log('video play from beginning...')
-        videoMode()
+        switchToVideoMode()
         window.isVideoPlaying = true
         video.currentTime = 0
         clearInterval(countdownInterval);
@@ -128,8 +124,15 @@ function onVideoLoaded() {
 
 }
 
-var get_webcam = function() {
-    video = document.createElement('video');
+var getVideo = function() {
+
+    video = document.querySelector('video');
+    enableInlineVideo(video)
+
+    document.addEventListener('touchstart', function () {
+        video.play();
+    });
+
     video.width = ortho_width;
     video.height = ortho_height;
     video.muted = true;
@@ -139,7 +142,7 @@ var get_webcam = function() {
     video.onended = function() {
         console.log('video done show countdown...')
 
-        imageMode()
+        switchToImageMode()
         $clock.show()
         this.currentTime = 0
         this.addEventListener('loadedmetadata', onVideoLoaded)
@@ -186,7 +189,7 @@ function getCurrentCountdown(dates) {
         if (diffTime < 0 && diffTime > -video.duration + 1) {
 
             console.log('video play from', diffTime * -1)
-            videoMode()
+            switchToVideoMode()
             $clock.hide()
             currentCountdown = diffTime
             currentDuration = duration
@@ -211,27 +214,10 @@ function getCurrentCountdown(dates) {
 
 }
 
-var imgContainer = $('img')[0]
-
-function scrollPageToCenter(){
-
-    var outer = window.innerWidth
-    var inner = imgContainer.offsetWidth;
-    console.log(inner, outer);
-    $(document.body).scrollLeft((inner - outer) / 2)
-
-    var outer = window.innerHeight
-    var inner = imgContainer.offsetHeight;
-    console.log(inner, outer);
-    $(document.body).scrollTop((inner - outer) / 2)
-
-}
-
-scrollPageToCenter()
+var imgContainer = $('#tv-set')[0]
 
 
 var init = function() {
-
 
 
     scene = new THREE.Scene();
@@ -241,7 +227,7 @@ var init = function() {
     container = document.getElementById('canale-container');
 
     var imgConWidth = imgContainer.offsetWidth
-    var rendererWidth = imgConWidth / 2.5
+    var rendererWidth = imgConWidth / rendererToImageRatio
     container.style.width = rendererWidth + 'px'
 
     scrollPageToCenter()
@@ -249,8 +235,6 @@ var init = function() {
 
     renderer.setPixelRatio(window.devicePixelRatio);
     renderer.setSize(container.offsetWidth, container.offsetHeight);
-    // renderer.setSize( ortho_width, ortho_height );
-
 
     container.appendChild(renderer.domElement);
     $clock = $('<div class="clock animate-glitch"></div>').appendTo(container)
@@ -264,19 +248,12 @@ var init = function() {
 
     video_tex = new THREE.Texture(video);
 
-    var src = 'img/tv-countdown.png'
+    var src = 'img/tv-screen.png'
 
     image_tex = new THREE.TextureLoader().load(src);
 
     var image = new Image();
     image.src = src;
-
-    // image.onload = function() {
-    //     image_tex = new THREE.Texture();
-    //     image_tex.image = image;
-    //     image_tex.needsUpdate = true;
-    //     image_tex.minFilter = THREE.LinearFilter
-    // }
 
     video_tex.minFilter = THREE.LinearFilter //- to use non powers of two image
     image_tex.minFilter = THREE.LinearFilter
@@ -391,7 +368,7 @@ var init = function() {
 
     scene.add(camera);
 
-    imageMode()
+    switchToImageMode()
 
     animate();
 
@@ -402,7 +379,7 @@ var videos = {},
     isVideoPlaying = false
 
 
-function videoMode() {
+function switchToVideoMode() {
 
     video_mat.uniforms['u_comp_mode'].value = 0
     video_mesh_norm.material.map = video_tex
@@ -412,18 +389,26 @@ function videoMode() {
 }
 
 isPowered = false
-onClick = function(){
+
+function onClick(){
 
     isPowered = !isPowered
     if (isPowered){
+        timer = 0
         $('#tv-power').show()
-        $('#tv-bg').removeClass('transparent')
+        $('#tv-standby').hide()
+        $('#tv-set').removeClass('transparent')
+        $('#tv-reflection').show()
+        $('#tv-glow').show()
         $('canvas').removeClass('transparent')
         $clock.removeClass('animate-glitch')
 
     }else{
         $('#tv-power').hide()
-        $('#tv-bg').addClass('transparent')
+        $('#tv-standby').show()
+        $('#tv-set').addClass('transparent')
+        $('#tv-reflection').hide()
+        $('#tv-glow').hide()
         $('canvas').addClass('transparent')
         $clock.addClass('animate-glitch')
     }
@@ -432,7 +417,9 @@ onClick = function(){
 
 $(document).click(onClick)
 
-function imageMode() {
+
+
+function switchToImageMode() {
     video_mat.uniforms['u_comp_mode'].value = 1;
     video_mesh_norm.material.map = image_tex
     video_tex.needsUpdate = true
@@ -531,86 +518,23 @@ var animate = function() {
 };
 
 
-socket.on('img_url', function(data) {
-    var image = new Image();
-    image.src = data;
-    image.onload = function() {
-        image_tex = new THREE.Texture();
-        image_tex.image = image;
-        image_tex.needsUpdate = true;
-        image_tex.minFilter = THREE.LinearFilter
-    }
-});
-socket.on('mode', function(data) {
-    switch (data) {
-        case 'bnw':
-            is_bnw = !is_bnw;
-            break;
-        case 'cam':
-            the_mode = 'cam';
-            break;
-        case 'image':
-            the_mode = 'image';
-            break;
-        case 'composition':
-            the_mode = 'composition';
-            break;
-        default:
-            break;
-    }
-});
-socket.on('blend_mode', function(data) {
-    switch (data) {
-        case 'add':
-            blending_mode = 0;
-            break;
-        case 'subtract':
-            blending_mode = 1;
-            break;
-        case 'multiply':
-            blending_mode = 2;
-            break;
-        case 'overlay':
-            blending_mode = 3;
-            break;
-        default:
-            break;
-    }
-});
-socket.on('mic_sensitivity', function(data) {
-    mic_sensitivity = data;
-});
-socket.on('mic_compressor', function(data) {
-    mic_compressor = data;
-});
-socket.on('colorR', function(data) {
-    colorR = data;
-});
-socket.on('colorG', function(data) {
-    colorG = data;
-});
-socket.on('colorB', function(data) {
-    colorB = data;
-});
-socket.on('contrast', function(data) {
-    contrast = data;
-});
-socket.on('brightness', function(data) {
-    brightness = data;
-});
-
-var create_socket_room = function(_ip) {
-    socket.on('connect', function() {
-        socket.emit('room', _ip);
-    });
-};
-
 document.addEventListener('DOMContentLoaded', function() {
-    get_webcam();
+    getVideo();
     init();
 
-    $.getJSON("https://jsonip.com/?callback=?", function(data) {
-        create_socket_room(data.ip);
-    });
 });
+
 window.addEventListener('resize', adjustViewspace, false);
+
+
+function scrollPageToCenter(){
+
+    var outer = window.innerWidth
+    var inner = imgContainer.offsetWidth;
+    $(document.body).scrollLeft((inner - outer) / 2)
+
+    var outer = window.innerHeight
+    var inner = imgContainer.offsetHeight;
+    $(document.body).scrollTop((inner - outer) / 2)
+
+}

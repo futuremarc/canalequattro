@@ -5,6 +5,24 @@
   src: url('../../font/VCR_OSD_MONO_1.001.ttf') format('truetype');
 }
 
+
+.IIV::-webkit-media-controls-play-button,
+.IIV::-webkit-media-controls-start-playback-button {
+     opacity: 0;
+     pointer-events: none;
+     width: 5px;
+ }
+
+ html {
+  @media only screen and (orientation: portrait) and (max-width: 555px) {
+    transform: rotate(90deg);
+    width: calc(155%);
+    .content {
+      width: calc(155%);
+    }
+  }
+}
+
 body{
 		margin: 0;
 		padding: 0;
@@ -21,46 +39,75 @@ body{
 
     img{
         width:auto;
-        height:100%;
+        height:120%;
+        top:-10%;
         margin:auto;
         left:0;
         right:0;
         position: absolute;
-        z-index:10;
         
-        @media(min-width: 768px){
+/*        @media(min-width: 768px){
             height: 180%;
             margin-left: 50%;
             transform: translateX(-50%);
         }
+*/
         
 
     }
 
 
+    .highIndex{
+        z-index: 15;
+    }
     #tv-power{
         display: none;
+        z-index: 15;
+    }
+
+    #tv-standby{
+        z-index:15;
+    }
+
+    #tv-reflection{
+        display:none;
+    }
+
+
+
+    #tv-set{
+        z-index:15;
+    }
+
+    #tv-glow{
+       display: none;
+       width:auto;
+       height:130%;
     }
 
     #canale-container{
-        width:40%;
-        height:35%;
+
+        width:45%;
+        height:43%;
         margin:auto;
         left:0;
         right:0;
         bottom:0;
-        top:0;
+        top:-10%;
         position: absolute;
-        z-index:9;
-        margin-left: 50%;
     
+ /*       @media(max-width: 768px){
+            transform: translateX(50%);
+        }*/
+
+/*        
         @media(min-width: 768px){
             top:68%;
             height:55%;
 
             margin:auto;
         }
-
+*/
     
         .clock{
             
@@ -69,29 +116,29 @@ body{
             background:none;
             top:20%;
             right:5%;
-            font-size:1.5vh;
+            font-size:2.3vh;
             
 
-            @media(min-width: 768px){
+/*            @media(min-width: 768px){
                 font-size:3.5vh;
             }
-
+*/
 
             display:inline-block;
             position:absolute;
 
             div{
                 display:inline;
-                margin-left:1vh;
-                margin-right:1vh;
+                margin-left:1.4vh;
+                margin-right:1.4vh;
 
 
-                @media(min-width: 768px){
+/*                @media(min-width: 768px){
                     margin-left:1.38vh;
                     margin-right:1.38vh;
                 }
 
-              
+              */
             }
 
         }
@@ -160,12 +207,54 @@ body{
   50%  { opacity:0; }
   100% { opacity:1; }
 }
+
 .animate-flicker {
    -webkit-animation: flickerAnim 1s infinite;
    -moz-animation: flickerAnim 1s infinite;
    -o-animation: flickerAnim 1s infinite;
     animation: flickerAnim 1s infinite;
 }
+
+
+.animate-glow-power {
+    animation: glowAnimPower 4s infinite;
+}
+
+@keyframes glowAnimPower {
+  0%   { opacity: 1; }
+  40%  { opacity: 1; }
+  44%  { opacity: .1; }
+  50%  { opacity:.5; }
+  100% { opacity: 1; }
+}
+
+
+.animate-glow-halo {
+    animation: glowAnimHalo 10s infinite;
+}
+
+@keyframes glowAnimHalo {
+  0%   { opacity: 1; }
+  20%  { opacity: .6; }
+  25%  { opacity: 1; }
+  70%  { opacity: .8; }
+  100% { opacity: 1; }
+}
+
+
+.animate-glow-reflection {
+    animation: glowAnimReflection 10s infinite;
+}
+
+@keyframes glowAnimReflection {
+  0%   { opacity: 1; }
+  20%  { opacity: .6; }
+  25%  { opacity: 1; }
+  70%  { opacity: .65; }
+  90%  { opacity: .70; }
+  100% { opacity: 1; }
+}
+
 
 /*
 

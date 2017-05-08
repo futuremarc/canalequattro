@@ -8,6 +8,7 @@
 		<link href="https://fonts.googleapis.com/css?family=Roboto+Condensed:400" rel="stylesheet">
         <link href="css/local/main.css" rel="stylesheet">
         <script src="js/lib/socket.io.min.js"></script>
+        <script src="js/lib/iphone-inline-video.min.js"></script>
         <script src="js/lib/jquery.min.js"></script>
         <script src="js/lib/moment.js"></script>
         <script src="js/lib/three.min.js" type="text/javascript"></script>
@@ -251,10 +252,16 @@
 
 	</head>
 	<body>
-        <div id="canale-container"></div>
-        <img id="tv-bg" src="img/tv-bg.png" class="transparent" ></img>
-        <img id="tv-standby" src="img/tv-standby.png" class="animate-flicker"></img>
-        <img id="tv-power" src="img/tv-power.png"></img>
+        <div class='content'>
+            <video src="video/test.mp4" style="display:none" playsinline></video>
+            <div id="canale-container"></div>
+            <img id="tv-glow" src="img/tv-glow.png" class="animate-glow-halo" ></img>
+            <img id="tv-set" src="img/tv-set.png" class="transparent"></img>
+            <img id="tv-standby" src="img/tv-standby.png" class="animate-flicker"></img>
+            <img id="tv-power" src="img/tv-power.png" class="animate-glow-power"></img>
+            <img id="tv-reflection" src="img/tv-reflection.png" class="animate-glow-reflection" ></img>
+        </div>
+        
 		<script src="js/local/main.js" type="text/javascript"></script>
 	</body>
 </html>
