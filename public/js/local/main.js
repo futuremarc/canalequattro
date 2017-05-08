@@ -5,7 +5,7 @@ navigator.getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia 
 var audioCtx = new(window.AudioContext || window.webkitAudioContext || window.mozAudioContext || window.msAudioContext)();
 var analyserNode = audioCtx.createAnalyser();
 var bufferLength = analyserNode.frequencyBinCount;
-var mic_input = new Uint8Array(bufferLength);
+var audioInput = new Uint8Array(bufferLength);
 
 var scene, buffer_scene, camera, buffer_cam, renderer, container;
 var image_tex, video, buffer, pre_video_tex, video_tex, video_mat, video_mesh, video_geo, buffer_mat, buffer_geo, buffer_mesh, video_tex_norm, video_mat_norm, video_mesh_norm, video_geo_norm;
@@ -16,16 +16,12 @@ var ortho_width = 1920,
 var timer = 0,
     zero_to_one = 0;
 
-var socket = io.connect('http://localhost:5050', {
-    path: '/socket'
-});
-
 var is_bnw = false,
     is_fullscreen = false;
 var the_mode = 'image',
     the_mode_index = 0,
     blending_mode = 0;
-var mic_sensitivity = 2.2,
+var mic_sensitivity = 1.5,
     mic_compressor = 2.3,
     colorR = .0,
     colorG = .0,
@@ -34,57 +30,123 @@ var mic_sensitivity = 2.2,
     brightness = 0.
 
 var container
-var dates = ['7-5-2017 13:43:00 EDT', '7-5-2017 13:43:30 EDT', '7-5-2017 12:44:00 EDT', '9-5-2017 07:00:00 EDT', '9-5-2017 14:00:00 EDT', '9-5-2017 20:00:00 EDT', '9-5-2017 23:00:00 EDT'],
+var dates = ['8-5-2017 18:45:00 EDT', '7-5-2017 18:45:30 EDT', '7-5-2017 18:29:00 EDT', '9-5-2017 07:00:00 EDT', '9-5-2017 14:00:00 EDT', '9-5-2017 20:00:00 EDT', '9-5-2017 23:00:00 EDT'],
     interval = 1000,
-    currentDuration
+    currentDuration,
+    countdownInterval
 
-var rendererToImageRatio = 2.1
+var rendererToImageRatio = 2.1,
+    isGlitch = false,
+    isVideoPlaying = false,
+    isTvPowered = false,
+    imgContainer,
+    videos = {}
 
-var adjustViewspace = function() {
 
-    var imgConWidth = imgContainer.offsetWidth
-    var rendererWidth = imgConWidth / rendererToImageRatio
 
-    container.style.width = rendererWidth + 'px'
-    renderer.setSize(container.offsetWidth, container.offsetHeight);
-    camera.aspect = container.offsetWidth / container.offsetHeight;
-    camera.updateProjectionMatrix();
+
+
+var animate = function() {
+    requestAnimationFrame(animate);
+    getAudioInput();
+    render();
 };
 
-var setupAudioNodes = function(stream) {
-    var sampleSize = 1024;
-    var sourceNode = audioCtx.createMediaStreamSource(stream);
-    var filter_low = audioCtx.createBiquadFilter();
-    var filter_high = audioCtx.createBiquadFilter();
-    filter_low.frequency.value = 60.0;
-    filter_high.frequency.value = 1280.0;
-    filter_low.type = 'lowpass';
-    filter_high.type = 'highpass';
-    filter_low.Q = 10.0;
-    filter_high.Q = 1.0;
-    analyserNode.smoothingTimeConstant = 0.0;
-    analyserNode.fftSize = 1024;
 
-    sourceNode.connect(filter_low);
-    sourceNode.connect(filter_high);
-    filter_low.connect(analyserNode);
-    filter_high.connect(analyserNode);
+var render = function() {
+    camera.lookAt(scene.position);
 
-    mic_input = new Uint8Array(analyserNode.frequencyBinCount);
-};
+    if (video.readyState === video.HAVE_ENOUGH_DATA) {
+        video_tex.needsUpdate = true;
+        image_tex.needsUpdate = true
+    }
 
-var get_mic_input = function() {
-    analyserNode.getByteFrequencyData(mic_input);
+    if (!isVideoPlaying) {
+        video_mesh_norm.visible = false
+        video_mesh.visible = false
+    }
+
+    if (!isTvPowered) return
+
+    if (timer === 0) $clock.removeClass('animate-glitch')
+    else if (timer === 50) $clock.addClass('animate-glitch')
+    else if (timer === 300) $clock.removeClass('animate-glitch')
+    else if (timer === 600) $clock.addClass('animate-glitch')
+    else if (timer === 900) $clock.removeClass('animate-glitch')
+
+    if (timer > 50 && timer < 300) isGlitch = true
+    else if (timer > 300 && timer < 600) isGlitch = false
+    else if (timer > 600 && timer < 900) isGlitch = true
+    else if (timer > 900 && timer < 1000) isGlitch = false
+    else if (timer > 1000) timer = 0
+
+    if (isGlitch) {
+
+
+        video_mesh_norm.visible = false
+        video_mesh.visible = true
+
+
+        var tre = audioInput[200] / 255.;
+        var mid = audioInput[100] / 255.;
+        var bass = audioInput[2] / 255.;
+
+        //console.log('tre : ', tre, ', mid : , ', mid, ', bass : ', bass);
+
+        video_mat.uniforms['u_video_tex'].value = video_tex;
+        video_mat.uniforms['u_image_tex'].value = image_tex;
+
+        if (the_mode === 'cam') {
+
+        } else if (the_mode === 'image') {
+
+        } else if (the_mode === 'composition')
+            video_mat.uniforms['u_comp_mode'].value = 2;
+
+        video_mat.uniforms['u_blend_mode'].value = blending_mode;
+
+        video_mat.uniforms['u_time'].value = timer;
+        video_mat.uniforms['u_bass'].value = bass;
+        video_mat.uniforms['u_mid'].value = mid;
+        video_mat.uniforms['u_treble'].value = tre;
+        video_mat.uniforms['u_0to1'].value = zero_to_one;
+        video_mat.uniforms['u_random'].value = Math.random();
+        video_mat.uniforms['u_bnw'].value = is_bnw;
+        video_mat.uniforms['u_mic_sensitivity'].value = mic_sensitivity;
+        video_mat.uniforms['u_mic_compressor'].value = mic_compressor;
+        video_mat.uniforms['u_colorR'].value = colorR;
+        video_mat.uniforms['u_colorG'].value = colorG;
+        video_mat.uniforms['u_colorB'].value = colorB;
+        video_mat.uniforms['u_brightness'].value = brightness;
+        video_mat.uniforms['u_contrast'].value = contrast;
+
+
+    } else {
+        video_mesh.visible = false
+        video_mesh_norm.visible = true
+    }
+
+
+    renderer.clear();
+    renderer.render(scene, camera);
+
+    timer++;
+
+    if (zero_to_one > 1.) {
+        zero_to_one = 0.;
+    }
+    zero_to_one += 0.001;
 };
 
 
 function onInterval() {
 
     currentDuration = moment.duration(currentDuration.asMilliseconds() - interval, 'milliseconds');
-    var d = moment.duration(currentDuration).days(),
-        h = moment.duration(currentDuration).hours(),
-        m = moment.duration(currentDuration).minutes(),
-        s = moment.duration(currentDuration).seconds();
+
+    var d = moment.duration(currentDuration).days();
+    var h = moment.duration(currentDuration).hours();
+    var m = moment.duration(currentDuration).minutes();
+    var s = moment.duration(currentDuration).seconds();
 
     d = $.trim(d).length === 1 ? '0' + d : d;
     h = $.trim(h).length === 1 ? '0' + h : h;
@@ -99,78 +161,20 @@ function onInterval() {
 
 
     if (d < 1 && h < 1 && m < 1 && s < 1 && !isVideoPlaying) {
-        $clock.hide()
         console.log('video play from beginning...')
+
+        $clock.hide()
         switchToVideoMode()
         window.isVideoPlaying = true
         video.currentTime = 0
         clearInterval(countdownInterval);
         video.play()
+
         return
     }
 
-
 }
 
-var countdownInterval
-
-function onVideoLoaded() {
-
-    console.log('video loaded')
-
-    countdownInterval = setInterval(onInterval, interval);
-    getCurrentCountdown(dates)
-    this.removeEventListener('loadedmetadata', onVideoLoaded)
-
-}
-
-var getVideo = function() {
-
-    video = document.querySelector('video');
-    enableInlineVideo(video)
-
-    document.addEventListener('touchstart', function () {
-        video.play();
-    });
-
-    video.width = ortho_width;
-    video.height = ortho_height;
-    video.muted = true;
-    video.src = 'video/test.mp4'
-    video.load()
-
-    video.onended = function() {
-        console.log('video done show countdown...')
-
-        switchToImageMode()
-        $clock.show()
-        this.currentTime = 0
-        this.addEventListener('loadedmetadata', onVideoLoaded)
-        this.load()
-        isVideoPlaying = false
-    }
-
-    video.addEventListener('loadedmetadata', onVideoLoaded)
-
-    if (navigator.getUserMedia) {
-        navigator.getUserMedia({
-            audio: true,
-            video: {
-                width: ortho_width,
-                height: ortho_height,
-                facingMode: {
-                    exact: "environment"
-                }
-            }
-        }, function(stream) {
-            setupAudioNodes(stream);
-        }, function(err) {
-            console.log('failed to get a steram : ', err);
-        });
-    } else {
-        console.log('user media is not supported');
-    }
-};
 
 
 function getCurrentCountdown(dates) {
@@ -214,8 +218,6 @@ function getCurrentCountdown(dates) {
 
 }
 
-var imgContainer = $('#tv-set')[0]
-
 
 var init = function() {
 
@@ -229,9 +231,6 @@ var init = function() {
     var imgConWidth = imgContainer.offsetWidth
     var rendererWidth = imgConWidth / rendererToImageRatio
     container.style.width = rendererWidth + 'px'
-
-    scrollPageToCenter()
-
 
     renderer.setPixelRatio(window.devicePixelRatio);
     renderer.setSize(container.offsetWidth, container.offsetHeight);
@@ -374,9 +373,38 @@ var init = function() {
 
 };
 
-var videos = {},
-    isGlitch = false,
-    isVideoPlaying = false
+
+function onClick() {
+
+    isTvPowered = !isTvPowered
+    if (isTvPowered) {
+
+        timer = 0
+        $('#tv-power').show()
+        $('#tv-standby').hide()
+        $('#tv-set').show()
+        $('#tv-reflection').show()
+        $('#tv-glow').show()
+        $('canvas').removeClass('transparent')
+
+    } else {
+        $('#tv-power').hide()
+        $('#tv-standby').show()
+        $('#tv-set').hide()
+        $('#tv-reflection').hide()
+        $('#tv-glow').hide()
+        $('canvas').addClass('transparent')
+    }
+
+}
+
+
+function switchToImageMode() {
+    video_mat.uniforms['u_comp_mode'].value = 1;
+    video_mesh_norm.material.map = image_tex
+    video_tex.needsUpdate = true
+    image_tex.needsUpdate = true
+}
 
 
 function switchToVideoMode() {
@@ -388,145 +416,94 @@ function switchToVideoMode() {
 
 }
 
-isPowered = false
 
-function onClick(){
+var initAudioNodes = function(source) {
+    var sampleSize = 1024;
+    var sourceNode = audioCtx.createMediaElementSource(source);
+    var filter_low = audioCtx.createBiquadFilter();
+    var filter_high = audioCtx.createBiquadFilter();
+    filter_low.frequency.value = 60.0;
+    filter_high.frequency.value = 1280.0;
+    filter_low.type = 'lowpass';
+    filter_high.type = 'highpass';
+    filter_low.Q = 10.0;
+    filter_high.Q = 1.0;
+    analyserNode.smoothingTimeConstant = 0.0;
+    analyserNode.fftSize = 1024;
 
-    isPowered = !isPowered
-    if (isPowered){
+    sourceNode.connect(filter_low);
+    sourceNode.connect(filter_high);
+    filter_low.connect(analyserNode);
+    filter_high.connect(analyserNode);
 
-        timer = 0
-        $('#tv-power').show()
-        $('#tv-standby').hide()
-        $('#tv-set').removeClass('transparent')
-        $('#tv-reflection').show()
-        $('#tv-glow').show()
-        $('canvas').removeClass('transparent')
-
-    }else{
-        $('#tv-power').hide()
-        $('#tv-standby').show()
-        $('#tv-set').addClass('transparent')
-        $('#tv-reflection').hide()
-        $('#tv-glow').hide()
-        $('canvas').addClass('transparent')
-    }
-    adjustViewspace()
-}
-
-$(document).click(onClick)
-
-
-
-function switchToImageMode() {
-    video_mat.uniforms['u_comp_mode'].value = 1;
-    video_mesh_norm.material.map = image_tex
-    video_tex.needsUpdate = true
-    image_tex.needsUpdate = true
-}
-var render = function() {
-    camera.lookAt(scene.position);
-
-    if (video.readyState === video.HAVE_ENOUGH_DATA) {
-        video_tex.needsUpdate = true;
-        image_tex.needsUpdate = true
-    }
-
-    if (!isVideoPlaying) {
-        video_mesh_norm.visible = false
-        video_mesh.visible = false
-    }
-
-    if (!isPowered) return
-
-    if (timer === 0) $clock.removeClass('animate-glitch')
-    else if (timer === 50) $clock.addClass('animate-glitch')
-    else if (timer === 300) $clock.removeClass('animate-glitch')
-    else if (timer === 600) $clock.addClass('animate-glitch')
-    else if (timer === 900) $clock.removeClass('animate-glitch')
-
-    if (timer > 50 && timer < 300) isGlitch = true
-    else if (timer > 300 && timer < 600) isGlitch = false
-    else if (timer > 600 && timer < 900) isGlitch = true
-    else if (timer > 900 && timer < 1000) isGlitch = false
-    else if (timer > 1000) timer = 0
-
-    if (isGlitch) {
-
-
-        video_mesh_norm.visible = false
-        video_mesh.visible = true
-
-
-        var tre = mic_input[200] / 255.;
-        var mid = mic_input[100] / 255.;
-        var bass = mic_input[2] / 255.;
-
-        //console.log('tre : ', tre, ', mid : , ', mid, ', bass : ', bass);
-
-        video_mat.uniforms['u_video_tex'].value = video_tex;
-        video_mat.uniforms['u_image_tex'].value = image_tex;
-
-        if (the_mode === 'cam') {
-
-        } else if (the_mode === 'image') {
-
-        } else if (the_mode === 'composition')
-            video_mat.uniforms['u_comp_mode'].value = 2;
-
-        video_mat.uniforms['u_blend_mode'].value = blending_mode;
-
-        video_mat.uniforms['u_time'].value = timer;
-        video_mat.uniforms['u_bass'].value = bass;
-        video_mat.uniforms['u_mid'].value = mid;
-        video_mat.uniforms['u_treble'].value = tre;
-        video_mat.uniforms['u_0to1'].value = zero_to_one;
-        video_mat.uniforms['u_random'].value = Math.random();
-        video_mat.uniforms['u_bnw'].value = is_bnw;
-        video_mat.uniforms['u_mic_sensitivity'].value = mic_sensitivity;
-        video_mat.uniforms['u_mic_compressor'].value = mic_compressor;
-        video_mat.uniforms['u_colorR'].value = colorR;
-        video_mat.uniforms['u_colorG'].value = colorG;
-        video_mat.uniforms['u_colorB'].value = colorB;
-        video_mat.uniforms['u_brightness'].value = brightness;
-        video_mat.uniforms['u_contrast'].value = contrast;
-
-
-
-    } else {
-        video_mesh.visible = false
-        video_mesh_norm.visible = true
-    }
-
-
-    renderer.clear();
-    renderer.render(scene, camera);
-
-    timer++;
-
-    if (zero_to_one > 1.) {
-        zero_to_one = 0.;
-    }
-    zero_to_one += 0.001;
+    audioInput = new Uint8Array(analyserNode.frequencyBinCount);
 };
 
-var animate = function() {
-    requestAnimationFrame(animate);
-    get_mic_input();
-    render();
+var getAudioInput = function() {
+    analyserNode.getByteFrequencyData(audioInput);
+};
+
+function initAudioInput(){
+    audio = document.querySelector('audio');
+    audio.play()
+    audio.loop = true
+    initAudioNodes(audio)
+}
+
+function initVideoInput() {
+
+    video = document.querySelector('video');
+    enableInlineVideo(video)
+
+    document.addEventListener('touchstart', function() {
+        video.play();
+    });
+
+    video.width = ortho_width;
+    video.height = ortho_height;
+    video.src = 'video/test.mp4'
+    video.load()
+
+    video.onended = function() {
+        console.log('video done show countdown...')
+
+        switchToImageMode()
+        $clock.show()
+        this.currentTime = 0
+        this.addEventListener('loadedmetadata', onVideoLoaded)
+        this.load()
+        isVideoPlaying = false
+    }
+
+    video.addEventListener('loadedmetadata', onVideoLoaded)
+
 };
 
 
-document.addEventListener('DOMContentLoaded', function() {
-    getVideo();
-    init();
+function onVideoLoaded() {
 
-});
+    console.log('video loaded')
 
-window.addEventListener('resize', adjustViewspace, false);
+    countdownInterval = setInterval(onInterval, interval);
+    getCurrentCountdown(dates)
+    this.removeEventListener('loadedmetadata', onVideoLoaded)
+
+}
 
 
-function scrollPageToCenter(){
+var adjustViewspace = function() {
+
+    var imgConWidth = imgContainer.offsetWidth
+    var rendererWidth = imgConWidth / rendererToImageRatio
+
+    container.style.width = rendererWidth + 'px'
+    renderer.setSize(container.offsetWidth, container.offsetHeight);
+    camera.aspect = container.offsetWidth / container.offsetHeight;
+    camera.updateProjectionMatrix();
+};
+
+
+function scrollPageToCenter() {
 
     var outer = window.innerWidth
     var inner = imgContainer.offsetWidth;
@@ -535,5 +512,19 @@ function scrollPageToCenter(){
     var outer = window.innerHeight
     var inner = imgContainer.offsetHeight;
     $(document.body).scrollTop((inner - outer) / 2)
-
 }
+
+function onDocumentLoaded() {
+    imgContainer = $('#tv-set')[0]
+    initVideoInput();
+    initAudioInput()
+    init();
+}
+
+
+document.addEventListener('DOMContentLoaded', onDocumentLoaded);
+window.addEventListener('resize', adjustViewspace, false);
+$(document).click(onClick)
+
+
+
