@@ -38,8 +38,9 @@ var dates = ['7-5-2017 13:43:00 EDT', '7-5-2017 13:43:30 EDT', '7-5-2017 12:44:0
     interval = 1000,
     currentDuration
 
-var window_resize = function() {
+var adjustViewspace = function() {
 
+    scrollPageToCenter()
     var imgConWidth = imgContainer.offsetWidth
     var rendererWidth = imgConWidth / 2.5
 
@@ -213,16 +214,21 @@ function getCurrentCountdown(dates) {
 
 var imgContainer = $('img')[0]
 
-var outer = window.innerWidth
-var inner = imgContainer.offsetWidth;
-console.log(inner, outer);
-$(document.body).scrollLeft((inner - outer) / 2)
+function scrollPageToCenter(){
 
-var outer = window.innerHeight
-var inner = imgContainer.offsetHeight;
-console.log(inner, outer);
-$(document.body).scrollTop((inner - outer) / 2)
+    var outer = window.innerWidth
+    var inner = imgContainer.offsetWidth;
+    console.log(inner, outer);
+    $(document.body).scrollLeft((inner - outer) / 2)
 
+    var outer = window.innerHeight
+    var inner = imgContainer.offsetHeight;
+    console.log(inner, outer);
+    $(document.body).scrollTop((inner - outer) / 2)
+
+}
+
+scrollPageToCenter()
 
 
 var init = function() {
@@ -247,7 +253,7 @@ var init = function() {
 
 
     container.appendChild(renderer.domElement);
-    $clock = $('<div class="clock"></div>').appendTo(container)
+    $clock = $('<div class="clock animate-glitch"></div>').appendTo(container)
 
 
     $d = $('<div>00</div>').appendTo($clock); //use spaces as placeholders for numbers
@@ -405,6 +411,27 @@ function videoMode() {
 
 }
 
+isPowered = false
+onClick = function(){
+
+    isPowered = !isPowered
+    if (isPowered){
+        $('#tv-power').show()
+        $('#tv-bg').removeClass('transparent')
+        $('canvas').removeClass('transparent')
+        $clock.removeClass('animate-glitch-strong')
+
+    }else{
+        $('#tv-power').hide()
+        $('#tv-bg').addClass('transparent')
+        $('canvas').addClass('transparent')
+        $clock.addClass('animate-glitch-strong')
+    }
+    adjustViewspace()
+}
+
+$(document).click(onClick)
+
 function imageMode() {
     video_mat.uniforms['u_comp_mode'].value = 1;
     video_mesh_norm.material.map = image_tex
@@ -423,6 +450,8 @@ var render = function() {
         video_mesh_norm.visible = false
         video_mesh.visible = false
     }
+
+    if (!isPowered) return
 
     if (timer === 0) $clock.removeClass('animate-glitch')
     else if (timer === 50) $clock.addClass('animate-glitch')
@@ -584,4 +613,4 @@ document.addEventListener('DOMContentLoaded', function() {
         create_socket_room(data.ip);
     });
 });
-window.addEventListener('resize', window_resize, false);
+window.addEventListener('resize', adjustViewspace, false);
