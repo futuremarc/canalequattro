@@ -41,6 +41,7 @@ var dates = ['7-5-2017 13:43:00 EDT', '7-5-2017 13:43:30 EDT', '7-5-2017 12:44:0
 var adjustViewspace = function() {
 
     scrollPageToCenter()
+
     var imgConWidth = imgContainer.offsetWidth
     var rendererWidth = imgConWidth / 2.5
 
@@ -418,13 +419,13 @@ onClick = function(){
         $('#tv-power').show()
         $('#tv-bg').removeClass('transparent')
         $('canvas').removeClass('transparent')
-        $clock.removeClass('animate-glitch-strong')
+        $clock.removeClass('animate-glitch')
 
     }else{
         $('#tv-power').hide()
         $('#tv-bg').addClass('transparent')
         $('canvas').addClass('transparent')
-        $clock.addClass('animate-glitch-strong')
+        $clock.addClass('animate-glitch')
     }
     adjustViewspace()
 }
