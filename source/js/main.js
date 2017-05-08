@@ -119,8 +119,6 @@ var countdownInterval
 
 function onVideoLoaded() {
 
-
-
     console.log('video loaded')
 
     countdownInterval = setInterval(onInterval, interval);
@@ -241,10 +239,11 @@ var init = function() {
     renderer.setClearColor(0x000000, 0);
     container = document.getElementById('canale-container');
 
-
     var imgConWidth = imgContainer.offsetWidth
     var rendererWidth = imgConWidth / 2.5
     container.style.width = rendererWidth + 'px'
+
+    scrollPageToCenter()
 
 
     renderer.setPixelRatio(window.devicePixelRatio);
