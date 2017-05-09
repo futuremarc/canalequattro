@@ -28,7 +28,7 @@ var mic_sensitivity = 1.5,
     brightness = 0.
 
 var container
-var dates = ['8-5-2017 18:45:00 EDT', '7-5-2017 18:45:30 EDT', '7-5-2017 18:29:00 EDT', '9-5-2017 07:00:00 EDT', '9-5-2017 14:00:00 EDT', '9-5-2017 20:00:00 EDT', '9-5-2017 23:00:00 EDT'],
+var dates = ['8-5-2017 21:38:00 EDT', '7-5-2017 21:38:30 EDT', '7-5-2017 21:39:00 EDT', '9-5-2017 07:00:00 EDT', '9-5-2017 14:00:00 EDT', '9-5-2017 20:00:00 EDT', '9-5-2017 23:00:00 EDT'],
     interval = 1000,
     currentDuration,
     countdownInterval
