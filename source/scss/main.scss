@@ -254,11 +254,11 @@ body{
 }
 
 @keyframes glowAnimReflectionOff {
-  0%   { opacity: .08; }
-  20%  { opacity: .05; }
-  25%  { opacity: .08; }
-  70%  { opacity: .04; }
-  100% { opacity: .08; }
+  0%   { opacity: .55; }
+  20%  { opacity: .34; }
+  25%  { opacity: .48; }
+  70%  { opacity: .35; }
+  100% { opacity: .55; }
 }
 
 
@@ -287,7 +287,7 @@ body{
 
 .loading{
   color:white;
-  font-size:80px;
+  font-size:40px;
   position:relative;
   margin:0 auto;
 }

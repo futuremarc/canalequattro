@@ -82,9 +82,6 @@ function initGenerativeNoiseInput() {
 
 }
 
-//countdown sound
-
-
 function playOsc(startTime, endTime) {
 
     var osc = audioCtx.createOscillator();
@@ -157,21 +154,21 @@ var render = function() {
 
     if (timer > 50 && timer < 150) {
         isGlitch = true
-        audio.play();
+        if (!isVideoPlaying) audio.play();
     } else if (timer > 150 && timer < 600) {
         isGlitch = false
-        audio.pause();
+        if (!isVideoPlaying) audio.pause();
     } else if (timer > 600 && timer < 700) {
         isGlitch = true
-        audio.play();
+        if (!isVideoPlaying) audio.play();
     } else if (timer > 700 && timer < 1200) {
         isGlitch = false
-        audio.pause();
+        if (!isVideoPlaying) audio.pause();
     } else if (timer > 1200) {
         timer = 0
     }
 
-    if (isGlitch) {
+    if (isGlitch && !isVideoPlaying) {
 
         video_mesh_norm.visible = false
         video_mesh.visible = true
@@ -473,7 +470,6 @@ function showScene() {
     $('#tv-power').show()
     $('#tv-standby').hide()
     $('#tv-set').removeClass('animate-glow-reflection-off')
-    $('#tv-set').addClass('animate-glow-set')
     $('#tv-reflection').removeClass('animate-glow-reflection-off')
     $('#tv-reflection').addClass('animate-glow-reflection')
     $('#tv-glow').show()
@@ -486,7 +482,6 @@ function hideScene() {
     $clock.addClass('animate-glitch')
     $('#tv-power').hide()
     $('#tv-standby').show()
-    $('#tv-set').removeClass('animate-glow-set')
     $('#tv-set').addClass('animate-glow-reflection-off')
     $('#tv-reflection').removeClass('animate-glow-reflection')
     $('#tv-reflection').addClass('animate-glow-reflection-off')
