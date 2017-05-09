@@ -445,11 +445,12 @@ function onDocumentClick() {
 
     if (!isCanaleInitialized && video && audio) {
 
+        console.log('canale initialized')
         video.play();
         if (!isVideoPlaying) video.pause()
         audio.play();
         isCanaleInitialized = true
-        console.log('canale initialized')
+    }
 
         isTvPowered = !isTvPowered
 
@@ -479,7 +480,6 @@ function onDocumentClick() {
 
     }
 
-}
 
 
 function switchToImageMode() {
