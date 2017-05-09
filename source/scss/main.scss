@@ -96,7 +96,7 @@ body{
             background:none;
             top:18%;
             right:4%;
-            font-size:2.5vh;
+            font-size:2.7vh;
             display:inline-block;
             position:absolute;
 
@@ -106,6 +106,7 @@ body{
                 margin-right:1.3vh;
 
                  @media(max-width: 768px){
+                    right:5%;
                     margin-left:.95vh;
                     margin-right:.95vh;
                     font-size:2.1vh;

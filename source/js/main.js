@@ -116,9 +116,8 @@ var render = function() {
     } else if (timer > 700 && timer < 1200) {
         isGlitch = false
         audio.pause();
-    } else if (timer > 1100) {
+    } else if (timer > 1200) {
         timer = 0
-        audio.play();
     }
 
     if (isGlitch) {
