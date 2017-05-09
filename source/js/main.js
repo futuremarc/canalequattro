@@ -8,7 +8,7 @@ var bufferLength = analyserNode.frequencyBinCount;
 var audioInput = new Uint8Array(bufferLength);
 
 var scene, buffer_scene, camera, buffer_cam, renderer, container;
-var image_tex, video, buffer, pre_video_tex, video_tex, video_mat, video_mesh, video_geo, buffer_mat, buffer_geo, buffer_mesh, video_tex_norm, video_mat_norm, video_mesh_norm, video_geo_norm;
+var image_tex, video, audio, buffer, pre_video_tex, video_tex, video_mat, video_mesh, video_geo, buffer_mat, buffer_geo, buffer_mesh, video_tex_norm, video_mat_norm, video_mesh_norm, video_geo_norm;
 var ortho_width = 1920,
     ortho_height = 1080,
     ortho_near = -1,
@@ -448,6 +448,7 @@ var getAudioInput = function() {
 function initAudioInput(){
     audio = document.querySelector('audio');
     audio.loop = true
+    audio.play()
     initAudioNodes(audio)
 }
 
