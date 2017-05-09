@@ -1,4 +1,21 @@
-var dates = ['9-5-2017 01:40:00 EDT', '9-5-2017 01:45:00 EDT', '9-5-2017 01:50:00 EDT', '9-5-2017 07:00:00 EDT', '9-5-2017 14:00:00 EDT', '9-5-2017 20:00:00 EDT', '9-5-2017 23:00:00 EDT', '10-5-2017 07:00:00 EDT', '10-5-2017 14:00:00 EDT', '10-5-2017 20:00:00 EDT', '10-5-2017 23:00:00 EDT']
+//var dates = ['9-5-2017 01:40:00 EDT', '9-5-2017 01:45:00 EDT', '9-5-2017 01:50:00 EDT', '9-5-2017 07:00:00 EDT', '9-5-2017 14:00:00 EDT', '9-5-2017 20:00:00 EDT', '9-5-2017 23:00:00 EDT', '10-5-2017 07:00:00 EDT', '10-5-2017 14:00:00 EDT', '10-5-2017 20:00:00 EDT', '10-5-2017 23:00:00 EDT']
+var dates = []
+var hour = 0
+var minute = 0
+var pace = 10
+
+for (var i = 0; i < 24; i++){
+
+    hour++
+
+    for (var j = 0; j < 60/pace; j++){
+        minute += pace
+        var date = '9-5-2017 ' + hour + ':' + minute +':00 EDT'
+        dates.push(date)
+    }
+
+    minute = 0
+}
 
 var audioCtx = new(window.AudioContext || window.webkitAudioContext || window.mozAudioContext || window.msAudioContext)();
 var analyserNode = audioCtx.createAnalyser();
@@ -65,7 +82,32 @@ function initGenerativeNoiseInput() {
 
 }
 
+//countdown sound
 
+
+function playOsc(startTime, endTime) {
+
+    var osc = audioCtx.createOscillator();
+    osc.type = 'sine';
+    osc.frequency.value = 440;
+
+    var gainNode = audioCtx.createGain();
+    gainNode.gain.value = .2
+    osc.connect(gainNode).connect(audioCtx.destination);
+
+    osc.start(startTime);
+    osc.stop(endTime);
+}
+
+
+function playCountdownSound() {
+
+    playOsc(audioCtx.currentTime, audioCtx.currentTime + 0.5);
+    playOsc(audioCtx.currentTime + 1.5, audioCtx.currentTime + 2);
+    playOsc(audioCtx.currentTime + 3, audioCtx.currentTime + 3.5);
+
+
+}
 
 function getGenerativeInput() {
 
@@ -189,7 +231,7 @@ var render = function() {
 };
 
 
-function onInterval() {
+function onCountdownInterval() {
 
     currentDuration = moment.duration(currentDuration.asMilliseconds() - interval, 'milliseconds');
 
@@ -209,8 +251,10 @@ function onInterval() {
     $m.text(m);
     $s.text(s);
 
+    if (d < 1 && h < 1 && m < 1 && s < 5 && s > 3 && !isVideoPlaying) playCountdownSound()
 
     if (d < 1 && h < 1 && m < 1 && s < 1 && !isVideoPlaying) {
+
         console.log('video play from beginning...')
 
         $clock.hide()
@@ -219,6 +263,7 @@ function onInterval() {
         video.currentTime = 0
         clearInterval(countdownInterval);
         video.play()
+        video.muted = false
 
         return
     }
@@ -559,7 +604,7 @@ function initAudioInput() {
 function onVideoLoaded() {
     console.log('video loaded')
 
-    countdownInterval = setInterval(onInterval, interval);
+    countdownInterval = setInterval(onCountdownInterval, interval);
     getCurrentCountdown(dates)
     this.removeEventListener('loadedmetadata', onVideoLoaded)
 
