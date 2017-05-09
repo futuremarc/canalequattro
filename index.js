@@ -16,6 +16,6 @@ app.use('/bower_components', express.static(path.join(__dirname, 'bower_componen
 
 app.use('/', express.static(path.join(__dirname, 'public')));
 
-var server = http.listen(3030, function() {
+var server = http.listen(8080, function() {
   console.log('listening on', this.address().port)
 })
