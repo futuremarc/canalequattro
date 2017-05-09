@@ -273,7 +273,7 @@ body{
 .loading:after{
   content:attr(data-text);
   position:absolute;
-  left:2px;
+  left:4px;
   text-shadow:-1px 0 red;
   top:0;
   color:white;
@@ -287,7 +287,7 @@ body{
 .loading:before{
   content:attr(data-text);
   position:absolute;
-  left:-2px;
+  left:-4px;
   text-shadow:1px 0 blue; 
   top:0;
   color:white;

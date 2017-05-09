@@ -1,4 +1,4 @@
-$(document).ready(function() {})
+var dates = ['9-5-2017 01:40:00 EDT', '9-5-2017 01:45:00 EDT', '9-5-2017 01:50:00 EDT', '9-5-2017 07:00:00 EDT', '9-5-2017 14:00:00 EDT', '9-5-2017 20:00:00 EDT', '9-5-2017 23:00:00 EDT', '10-5-2017 07:00:00 EDT', '10-5-2017 14:00:00 EDT', '10-5-2017 20:00:00 EDT', '10-5-2017 23:00:00 EDT']
 
 var audioCtx = new(window.AudioContext || window.webkitAudioContext || window.mozAudioContext || window.msAudioContext)();
 var analyserNode = audioCtx.createAnalyser();
@@ -7,19 +7,21 @@ var audioInput = new Uint8Array(bufferLength);
 
 var scene, buffer_scene, camera, buffer_cam, renderer, container;
 var image_tex, video, audio, audioTvOff, buffer, pre_video_tex, video_tex, video_mat, video_mesh, video_geo, buffer_mat, buffer_geo, buffer_mesh, video_tex_norm, video_mat_norm, video_mesh_norm, video_geo_norm;
+
 var ortho_width = 1920,
     ortho_height = 1080,
     ortho_near = -1,
     ortho_far = 1;
+
 var timer = 0,
     zero_to_one = 0;
 
 var is_bnw = false,
-    is_fullscreen = false;
-var the_mode = 'image',
+    is_fullscreen = false,
+    the_mode = 'image',
     the_mode_index = 0,
-    blending_mode = 0;
-var mic_sensitivity = 1.5,
+    blending_mode = 0,
+    mic_sensitivity = 1.5,
     mic_compressor = 2.3,
     colorR = .0,
     colorG = .0,
@@ -27,8 +29,7 @@ var mic_sensitivity = 1.5,
     contrast = 1.6,
     brightness = 0.
 
-var container
-var dates = ['9-5-2017 01:40:00 EDT', '9-5-2017 01:45:00 EDT', '9-5-2017 01:50:00 EDT', '9-5-2017 07:00:00 EDT', '9-5-2017 14:00:00 EDT', '9-5-2017 20:00:00 EDT', '9-5-2017 23:00:00 EDT','10-5-2017 07:00:00 EDT', '10-5-2017 14:00:00 EDT', '10-5-2017 20:00:00 EDT', '10-5-2017 23:00:00 EDT'],
+var container,
     interval = 1000,
     currentDuration,
     countdownInterval
@@ -37,30 +38,51 @@ var rendererToImageRatio = 2.1,
     isGlitch = false,
     isVideoPlaying = false,
     isTvPowered = false,
-    imgContainer,
-    videos = {}
+    imgContainer;
 
 
 
 var animate = function() {
     requestAnimationFrame(animate);
-    //getAudioInput();
     render();
 };
-
 
 
 var beat = 200;
 var volume = 1;
 var curveNumber = -3
+var curving, height
+var isGenerativeInput = false
 
-setInterval(function() {
-    beat = 60 + Math.random()*100;
-    volume = Math.min(1,Math.max(0.1,volume + Math.random()-0.5));
-}, 200);
+function initGenerativeNoiseInput() {
+
+    setInterval(function() {
+        beat = 60 + Math.random() * 100;
+        volume = Math.min(1, Math.max(0.1, volume + Math.random() - 0.5));
+    }, 200);
+
+    isGenerativeInput = true
+
+}
+
+
+
+function getGenerativeInput() {
+
+
+    curveNumber++
+    if (curveNumber > 6) curveNumber = -3
+
+    curving = Math.max(1, 30 * Math.abs(curveNumber));
+    curving = curving + 100 * volume;
+
+    height = Math.max(1, Math.min(curving, 240) + (Math.random() * 50 - 25));
+
+}
 
 
 var render = function() {
+
     camera.lookAt(scene.position);
 
     if (video.readyState === video.HAVE_ENOUGH_DATA) video_tex.needsUpdate = true;
@@ -72,20 +94,15 @@ var render = function() {
 
     if (!isTvPowered) return
 
-    curveNumber++
-    if (curveNumber > 6) curveNumber = -3
+    switch (timer) {
 
-    var curving = Math.max(1, 30*Math.abs(curveNumber));
-    curving = curving + 100*volume;
- 
-    var height = Math.max(1,Math.min(curving, 240) + (Math.random()*50-25));
-
-
-    if (timer === 0) $clock.removeClass('animate-glitch')
-    else if (timer === 50) $clock.addClass('animate-glitch')
-    else if (timer === 150) $clock.removeClass('animate-glitch')
-    else if (timer === 600) $clock.addClass('animate-glitch')
-    else if (timer === 700) $clock.removeClass('animate-glitch')
+        case 0 || 150 || 700:
+            $clock.removeClass('animate-glitch')
+            break;
+        case 50 || 600:
+            $clock.addClass('animate-glitch')
+            break;
+    }
 
     if (timer > 50 && timer < 150) {
         isGlitch = true
@@ -96,43 +113,42 @@ var render = function() {
     } else if (timer > 600 && timer < 700) {
         isGlitch = true
         audio.play();
-    } else if (timer > 700 && timer < 1000) {
+    } else if (timer > 700 && timer < 1200) {
         isGlitch = false
         audio.pause();
-    } else if (timer > 1000) {
+    } else if (timer > 1100) {
         timer = 0
         audio.play();
     }
 
     if (isGlitch) {
 
-
         video_mesh_norm.visible = false
         video_mesh.visible = true
 
+        if (isGenerativeInput) {
 
-        // var tre = audioInput[200] / 255.;
-        // var mid = audioInput[100] / 255.;
-        // var bass = audioInput[2] / 255.;
-        
-        var tre = height / 255.;
-        var mid = height / 255.;
-        var bass = height / 255.;
+            getGenerativeInput()
 
-        //console.log('tre : ', tre, ', mid : , ', mid, ', bass : ', bass);
+            var tre = height / 255.;
+            var mid = height / 255.;
+            var bass = height / 255.;
+
+
+        } else {
+
+            getAudioInput();
+
+            var tre = audioInput[200] / 255.;
+            var mid = audioInput[100] / 255.;
+            var bass = audioInput[2] / 255.;
+
+        }
+
 
         video_mat.uniforms['u_video_tex'].value = video_tex;
         video_mat.uniforms['u_image_tex'].value = image_tex;
-
-        if (the_mode === 'cam') {
-
-        } else if (the_mode === 'image') {
-
-        } else if (the_mode === 'composition')
-            video_mat.uniforms['u_comp_mode'].value = 2;
-
         video_mat.uniforms['u_blend_mode'].value = blending_mode;
-
         video_mat.uniforms['u_time'].value = timer;
         video_mat.uniforms['u_bass'].value = bass;
         video_mat.uniforms['u_mid'].value = mid;
@@ -160,9 +176,7 @@ var render = function() {
 
     timer++;
 
-    if (zero_to_one > 1.) {
-        zero_to_one = 0.;
-    }
+    if (zero_to_one > 1.) zero_to_one = 0.;
     zero_to_one += 0.001;
 };
 
@@ -241,13 +255,12 @@ function getCurrentCountdown(dates) {
 
     }
 
-
     return currentCountdown
 
 }
 
 
-var init = function() {
+var initCanvas = function() {
 
 
     scene = new THREE.Scene();
@@ -281,7 +294,7 @@ var init = function() {
 
         document.body.appendChild(container);
         console.log('done loading image')
-        
+
 
         video_tex.minFilter = THREE.LinearFilter //- to use non powers of two image
         image_tex.minFilter = THREE.LinearFilter
@@ -376,8 +389,6 @@ var init = function() {
         video_mesh = new THREE.Mesh(video_geo, video_mat);
         scene.add(video_mesh);
 
-        videos.glitch = video_mesh
-
         video_mat_norm = new THREE.MeshBasicMaterial({
             map: image_tex,
             color: 0xffffff,
@@ -391,13 +402,9 @@ var init = function() {
         video_mesh_norm = new THREE.Mesh(video_geo_norm, video_mat_norm);
 
         scene.add(video_mesh_norm);
-
-        videos.norm = video_mesh_norm
-
         scene.add(camera);
 
         switchToImageMode()
-
         animate();
 
     });
@@ -407,46 +414,61 @@ var init = function() {
 
 var isCanaleInitialized = false
 
-function onClick() {
+function showScene() {
+
+    $clock.removeClass('animate-glitch')
+    $('#tv-power').show()
+    $('#tv-standby').hide()
+    $('#tv-set').removeClass('animate-glow-reflection-off')
+    $('#tv-set').addClass('animate-glow-set')
+    $('#tv-reflection').removeClass('animate-glow-reflection-off')
+    $('#tv-reflection').addClass('animate-glow-reflection')
+    $('#tv-glow').show()
+    $('canvas').removeClass('transparent')
+
+}
+
+function hideScene() {
+
+    $clock.addClass('animate-glitch')
+    $('#tv-power').hide()
+    $('#tv-standby').show()
+    $('#tv-set').removeClass('animate-glow-set')
+    $('#tv-set').addClass('animate-glow-reflection-off')
+    $('#tv-reflection').removeClass('animate-glow-reflection')
+    $('#tv-reflection').addClass('animate-glow-reflection-off')
+    $('#tv-glow').hide()
+    $('canvas').addClass('transparent')
+}
+
+function onDocumentClick() {
 
     if (!isCanaleInitialized && video && audio) {
+
         video.play();
         if (!isVideoPlaying) video.pause()
         audio.play();
         isCanaleInitialized = true
         console.log('canale initialized')
-    }
 
     isTvPowered = !isTvPowered
+
     if (isTvPowered) {
 
-        timer = 0
-        $clock.removeClass('animate-glitch')
-        $('#tv-power').show()
-        $('#tv-standby').hide()
-        $('#tv-set').removeClass('animate-glow-reflection-off')
-        $('#tv-set').addClass('animate-glow-set')
-        $('#tv-reflection').removeClass('animate-glow-reflection-off')
-        $('#tv-reflection').addClass('animate-glow-reflection')
-        $('#tv-glow').show()
-        $('canvas').removeClass('transparent')
-        if (isCanaleInitialized){
+        timer = 0 //reset glitch timer
+        showScene()
+
+        if (isCanaleInitialized) {
             audio.play()
             audioTvOff.pause()
             video.muted = false
         }
 
     } else {
-        $clock.addClass('animate-glitch')
-        $('#tv-power').hide()
-        $('#tv-standby').show()
-        $('#tv-set').removeClass('animate-glow-set')
-        $('#tv-set').addClass('animate-glow-reflection-off')
-        $('#tv-reflection').removeClass('animate-glow-reflection')
-        $('#tv-reflection').addClass('animate-glow-reflection-off')
-        $('#tv-glow').hide()
-        $('canvas').addClass('transparent')
-        if (isCanaleInitialized){
+
+        hideScene()
+
+        if (isCanaleInitialized) {
             audioTvOff.play()
             audio.pause()
             video.muted = true
@@ -459,6 +481,7 @@ function onClick() {
 
 
 function switchToImageMode() {
+
     video_mat.uniforms['u_comp_mode'].value = 1;
     video_mesh_norm.material.map = image_tex
     video_tex.needsUpdate = true
@@ -472,28 +495,32 @@ function switchToVideoMode() {
     video_mesh_norm.material.map = video_tex
     video_tex.needsUpdate = true
     image_tex.needsUpdate = true
-
 }
 
 
 var initAudioNodes = function(source) {
+
     var sampleSize = 1024;
     var sourceNode = audioCtx.createMediaElementSource(source);
     var filter_low = audioCtx.createBiquadFilter();
     var filter_high = audioCtx.createBiquadFilter();
+
     filter_low.frequency.value = 60.0;
     filter_high.frequency.value = 1280.0;
     filter_low.type = 'lowpass';
     filter_high.type = 'highpass';
     filter_low.Q = 10.0;
     filter_high.Q = 1.0;
+
     analyserNode.smoothingTimeConstant = 0.0;
     analyserNode.fftSize = 1024;
 
     sourceNode.connect(filter_low);
     sourceNode.connect(filter_high);
+
     filter_low.connect(analyserNode);
     filter_high.connect(analyserNode);
+
     analyserNode.connect(audioCtx.destination)
 
     audioInput = new Uint8Array(analyserNode.frequencyBinCount);
@@ -503,7 +530,6 @@ var getAudioInput = function() {
     analyserNode.getByteFrequencyData(audioInput);
 };
 
-var isAudioNodesInitialized = false
 
 function initAudioInput() {
 
@@ -515,7 +541,7 @@ function initAudioInput() {
     audio = document.getElementById('noise-tv-on');
     audio.loop = true
     audio.volume = .45
-    //initAudioNodes(audio)
+    initAudioNodes(audio)
 
 }
 
@@ -572,38 +598,35 @@ var adjustViewspace = function() {
     camera.updateProjectionMatrix();
 };
 
-
-function scrollPageToCenter() {
-
-    var outer = window.innerWidth
-    var inner = imgContainer.offsetWidth;
-    $(document.body).scrollLeft((inner - outer) / 2)
-
-    var outer = window.innerHeight
-    var inner = imgContainer.offsetHeight;
-    $(document.body).scrollTop((inner - outer) / 2)
+function isIOS(){
+    return iOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream
 }
 
 function onDocumentLoaded() {
+
     $('.loading').hide()
     $('.content').show()
     imgContainer = $('#tv-set')[0]
+
+    if (isIOS) initGenerativeNoiseInput()
+    else initAudioInput()
+
     initVideoInput();
-    initAudioInput()
-    init();
+    initCanvas();
+
 }
 
 document.ontouchmove = function(e) {
     e.preventDefault();
 }
 
- var everythingLoaded = setInterval(function() {
-  if (/loaded|complete/.test(document.readyState)) {
-    clearInterval(everythingLoaded);
-    onDocumentLoaded()
-  }
+var everythingLoaded = setInterval(function() {
+    if (/complete/.test(document.readyState)) {
+        clearInterval(everythingLoaded);
+        onDocumentLoaded()
+    }
 }, 10);
 
-//document.addEventListener('DOMContentLoaded', onDocumentLoaded);
+
 window.addEventListener('resize', adjustViewspace, false);
-$(document).click(onClick)
+$(document).click(onDocumentClick)
