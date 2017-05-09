@@ -459,6 +459,29 @@ function initAudioInput() {
 
 }
 
+
+function onVideoLoaded() {
+    console.log('video loaded')
+
+    countdownInterval = setInterval(onInterval, interval);
+    getCurrentCountdown(dates)
+    this.removeEventListener('loadedmetadata', onVideoLoaded)
+
+}
+
+
+function onVideoEnded() {
+    console.log('video done show countdown...')
+
+    switchToImageMode()
+    $clock.show()
+    this.currentTime = 0
+    this.addEventListener('loadedmetadata', onVideoLoaded)
+    this.load()
+    isVideoPlaying = false
+}
+
+
 function initVideoInput() {
 
     video = document.querySelector('video');
@@ -468,33 +491,14 @@ function initVideoInput() {
     video.width = ortho_width;
     video.height = ortho_height;
     video.src = 'video/test.mp4'
+
+    $(video).on('ended', onVideoEnded)
+    $(video).on('loadedmetadata', onVideoLoaded)
+
     video.load()
-
-    video.onended = function() {
-        console.log('video done show countdown...')
-
-        switchToImageMode()
-        $clock.show()
-        this.currentTime = 0
-        this.addEventListener('loadedmetadata', onVideoLoaded)
-        this.load()
-        isVideoPlaying = false
-    }
-
-    video.addEventListener('loadedmetadata', onVideoLoaded)
 
 };
 
-
-function onVideoLoaded() {
-
-    console.log('video loaded')
-
-    countdownInterval = setInterval(onInterval, interval);
-    getCurrentCountdown(dates)
-    this.removeEventListener('loadedmetadata', onVideoLoaded)
-
-}
 
 
 var adjustViewspace = function() {
@@ -527,8 +531,8 @@ function onDocumentLoaded() {
     init();
 }
 
-document.ontouchmove = function (e) {
-  e.preventDefault();
+document.ontouchmove = function(e) {
+    e.preventDefault();
 }
 
 
