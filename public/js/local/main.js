@@ -28,7 +28,7 @@ var mic_sensitivity = 1.5,
     brightness = 0.
 
 var container
-var dates = ['8-5-2017 22:33:00 EDT', '7-5-2017 22:33:30 EDT', '7-5-2017 22:34:00 EDT', '9-5-2017 07:00:00 EDT', '9-5-2017 14:00:00 EDT', '9-5-2017 20:00:00 EDT', '9-5-2017 23:00:00 EDT'],
+var dates = ['8-5-2017 22:34:00 EDT', '7-5-2017 22:34:30 EDT', '7-5-2017 22:35:00 EDT', '9-5-2017 07:00:00 EDT', '9-5-2017 14:00:00 EDT', '9-5-2017 20:00:00 EDT', '9-5-2017 23:00:00 EDT'],
     interval = 1000,
     currentDuration,
     countdownInterval
@@ -65,10 +65,10 @@ var render = function() {
     if (!isTvPowered) return
 
     if (timer === 0) $clock.removeClass('animate-glitch')
-    // else if (timer === 50) $clock.addClass('animate-glitch')
-    // else if (timer === 300) $clock.removeClass('animate-glitch')
-    // else if (timer === 600) $clock.addClass('animate-glitch')
-    // else if (timer === 900) $clock.removeClass('animate-glitch')
+    else if (timer === 50) $clock.addClass('animate-glitch')
+    else if (timer === 300) $clock.removeClass('animate-glitch')
+    else if (timer === 600) $clock.addClass('animate-glitch')
+    else if (timer === 900) $clock.removeClass('animate-glitch')
 
     if (timer > 50 && timer < 300) isGlitch = true
     else if (timer > 300 && timer < 600) isGlitch = false
@@ -86,8 +86,6 @@ var render = function() {
         var tre = audioInput[200] / 255.;
         var mid = audioInput[100] / 255.;
         var bass = audioInput[2] / 255.;
-
-        $clock.html(tre + mid + bass)
 
         //console.log('tre : ', tre, ', mid : , ', mid, ', bass : ', bass);
 
@@ -152,10 +150,10 @@ function onInterval() {
     s = $.trim(s).length === 1 ? '0' + s : s;
 
     // show how many hours, minutes and seconds are left
-    // $d.text(d);
-    // $h.text(h);
-    // $m.text(m);
-    // $s.text(s);
+    $d.text(d);
+    $h.text(h);
+    $m.text(m);
+    $s.text(s);
 
 
     if (d < 1 && h < 1 && m < 1 && s < 1 && !isVideoPlaying) {
