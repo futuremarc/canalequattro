@@ -396,6 +396,8 @@ function onClick() {
         $('canvas').addClass('transparent')
     }
 
+    adjustViewspace()
+
 }
 
 
@@ -453,6 +455,7 @@ function initAudioInput(){
 function initVideoInput() {
 
     video = document.querySelector('video');
+    video.muted = true
     enableInlineVideo(video)
 
     document.addEventListener('touchstart', function() {
