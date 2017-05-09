@@ -411,7 +411,7 @@ function onClick() {
 
     if (!isCanaleInitialized && video && audio) {
         video.play();
-        video.pause()
+        if (!isVideoPlaying) video.pause()
         audio.play();
         isCanaleInitialized = true
         console.log('canale initialized')
