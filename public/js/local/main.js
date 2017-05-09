@@ -451,31 +451,33 @@ function onDocumentClick() {
         isCanaleInitialized = true
         console.log('canale initialized')
 
-    isTvPowered = !isTvPowered
+        isTvPowered = !isTvPowered
 
-    if (isTvPowered) {
+        if (isTvPowered) {
 
-        timer = 0 //reset glitch timer
-        showScene()
+            timer = 0 //reset glitch timer
+            showScene()
 
-        if (isCanaleInitialized) {
-            audio.play()
-            audioTvOff.pause()
-            video.muted = false
+            if (isCanaleInitialized) {
+                audio.play()
+                audioTvOff.pause()
+                video.muted = false
+            }
+
+        } else {
+
+            hideScene()
+
+            if (isCanaleInitialized) {
+                audioTvOff.play()
+                audio.pause()
+                video.muted = true
+            }
         }
 
-    } else {
+        adjustViewspace()
 
-        hideScene()
-
-        if (isCanaleInitialized) {
-            audioTvOff.play()
-            audio.pause()
-            video.muted = true
-        }
     }
-
-    adjustViewspace()
 
 }
 
@@ -598,7 +600,7 @@ var adjustViewspace = function() {
     camera.updateProjectionMatrix();
 };
 
-function isIOS(){
+function isIOS() {
     return /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream
 }
 
