@@ -378,7 +378,7 @@ function onClick() {
     if (!isCanaleInitialized && video && audio) {
         video.play();
         video.pause()
-        audio.play();
+        //audio.play();
         isCanaleInitialized = true
         console.log('canale initialized')
     }
@@ -469,7 +469,7 @@ var initAudioNodes = function(source) {
 
     xhr.responseType = 'arraybuffer'
     xhr.addEventListener("load", reqListener);
-    xhr.open("GET", "/audio/noise.mp3");
+    xhr.open("GET", "https://futuremarc.github.io/canalequattro/public/audio/noise.mp3");
     xhr.send();
 
 
