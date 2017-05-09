@@ -376,6 +376,7 @@ function onClick() {
     if (!isCanaleInitialized && video && audio) {
         video.play();
         video.pause()
+        initAudioInput()
         audio.play();
         isCanaleInitialized = true
         console.log('canale initialized')
@@ -458,6 +459,7 @@ function initAudioInput() {
     audio.addEventListener('canplay', function() {
         if (!isAudioNodesInitialized) initAudioNodes(audio)
         isAudioNodesInitialized = true
+        this.play()
     })
 
 }
@@ -526,7 +528,6 @@ function scrollPageToCenter() {
 function onDocumentLoaded() {
     imgContainer = $('#tv-set')[0]
     initVideoInput();
-    initAudioInput()
     init();
 }
 
