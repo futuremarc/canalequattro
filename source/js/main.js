@@ -28,7 +28,7 @@ var mic_sensitivity = 1.5,
     brightness = 0.
 
 var container
-var dates = ['8-5-2017 22:42:00 EDT', '8-5-2017 22:43:00 EDT', '8-5-2017 22:44:00 EDT', '9-5-2017 07:00:00 EDT', '9-5-2017 14:00:00 EDT', '9-5-2017 20:00:00 EDT', '9-5-2017 23:00:00 EDT'],
+var dates = ['9-5-2017 01:40:00 EDT', '9-5-2017 01:45:00 EDT', '9-5-2017 01:50:00 EDT', '9-5-2017 07:00:00 EDT', '9-5-2017 14:00:00 EDT', '9-5-2017 20:00:00 EDT', '9-5-2017 23:00:00 EDT','10-5-2017 07:00:00 EDT', '10-5-2017 14:00:00 EDT', '10-5-2017 20:00:00 EDT', '10-5-2017 23:00:00 EDT'],
     interval = 1000,
     currentDuration,
     countdownInterval
@@ -44,7 +44,7 @@ var rendererToImageRatio = 2.1,
 
 var animate = function() {
     requestAnimationFrame(animate);
-    getAudioInput();
+    //getAudioInput();
     render();
 };
 
@@ -281,8 +281,7 @@ var init = function() {
 
         document.body.appendChild(container);
         console.log('done loading image')
-        $('.loading').hide()
-        $('.content').show()
+        
 
         video_tex.minFilter = THREE.LinearFilter //- to use non powers of two image
         image_tex.minFilter = THREE.LinearFilter
@@ -434,6 +433,7 @@ function onClick() {
         if (isCanaleInitialized){
             audio.play()
             audioTvOff.pause()
+            video.muted = false
         }
 
     } else {
@@ -449,6 +449,7 @@ function onClick() {
         if (isCanaleInitialized){
             audioTvOff.play()
             audio.pause()
+            video.muted = true
         }
     }
 
@@ -508,13 +509,13 @@ function initAudioInput() {
 
     audioTvOff = document.getElementById('noise-tv-off');
     audioTvOff.loop = true
-    audioTvOff.volume = .35
+    audioTvOff.volume = .22
     audioTvOff.play()
 
     audio = document.getElementById('noise-tv-on');
     audio.loop = true
-    audio.volume = .6
-    initAudioNodes(audio)
+    audio.volume = .45
+    //initAudioNodes(audio)
 
 }
 
@@ -537,6 +538,7 @@ function onVideoEnded() {
     this.currentTime = 0
     this.addEventListener('loadedmetadata', onVideoLoaded)
     this.load()
+
     isVideoPlaying = false
 }
 
@@ -544,12 +546,11 @@ function onVideoEnded() {
 function initVideoInput() {
 
     video = document.querySelector('video');
-    video.muted = true
     enableInlineVideo(video)
 
     video.width = ortho_width;
     video.height = ortho_height;
-    video.src = 'video/test.mp4'
+    video.src = 'video/phoenix.mp4'
 
     $(video).on('ended', onVideoEnded)
     $(video).on('loadedmetadata', onVideoLoaded)
@@ -584,6 +585,8 @@ function scrollPageToCenter() {
 }
 
 function onDocumentLoaded() {
+    $('.loading').hide()
+    $('.content').show()
     imgContainer = $('#tv-set')[0]
     initVideoInput();
     initAudioInput()
@@ -594,7 +597,13 @@ document.ontouchmove = function(e) {
     e.preventDefault();
 }
 
+ var everythingLoaded = setInterval(function() {
+  if (/loaded|complete/.test(document.readyState)) {
+    clearInterval(everythingLoaded);
+    onDocumentLoaded()
+  }
+}, 10);
 
-document.addEventListener('DOMContentLoaded', onDocumentLoaded);
+//document.addEventListener('DOMContentLoaded', onDocumentLoaded);
 window.addEventListener('resize', adjustViewspace, false);
 $(document).click(onClick)
