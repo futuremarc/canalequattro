@@ -96,10 +96,19 @@ var render = function() {
 
     switch (timer) {
 
-        case 0 || 150 || 700:
+        case 0:
+            $clock.removeClass('animate-glitch')
+            break;
+        case 150:
+            $clock.removeClass('animate-glitch')
+            break;
+        case 700:
             $clock.removeClass('animate-glitch')
             break;
         case 50 || 600:
+            $clock.addClass('animate-glitch')
+            break;
+        case 600:
             $clock.addClass('animate-glitch')
             break;
     }
@@ -451,33 +460,33 @@ function onDocumentClick() {
         isCanaleInitialized = true
     }
 
-        isTvPowered = !isTvPowered
+    isTvPowered = !isTvPowered
 
-        if (isTvPowered) {
+    if (isTvPowered) {
 
-            timer = 0 //reset glitch timer
-            showScene()
+        timer = 0 //reset glitch timer
+        showScene()
 
-            if (isCanaleInitialized) {
-                audio.play()
-                audioTvOff.pause()
-                video.muted = false
-            }
-
-        } else {
-
-            hideScene()
-
-            if (isCanaleInitialized) {
-                audioTvOff.play()
-                audio.pause()
-                video.muted = true
-            }
+        if (isCanaleInitialized) {
+            audio.play()
+            audioTvOff.pause()
+            video.muted = false
         }
 
-        adjustViewspace()
+    } else {
 
+        hideScene()
+
+        if (isCanaleInitialized) {
+            audioTvOff.play()
+            audio.pause()
+            video.muted = true
+        }
     }
+
+    adjustViewspace()
+
+}
 
 
 

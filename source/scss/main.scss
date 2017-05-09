@@ -72,7 +72,7 @@ body{
     #tv-glow{
        display: none;
        width:auto;
-       height:120%;
+       height:140%;
     }
 
     #canale-container{
@@ -207,11 +207,13 @@ body{
 }
 
 @keyframes glowAnimHalo {
-  0%   { opacity: 1; }
-  20%  { opacity: .4; }
-  25%  { opacity: .9; }
-  70%  { opacity: .7; }
-  100% { opacity: 1; }
+  0%   { opacity: .55; }
+  20%  { opacity: .9; }
+  25%  { opacity: .7; }
+  35%  { opacity: .6; }
+  55%  { opacity: .7; }
+  70%  { opacity: .8; }
+  100% { opacity: .55; }
 }
 
 
@@ -220,12 +222,13 @@ body{
 }
 
 @keyframes glowAnimReflection {
-  0%   { opacity: 1; }
-  20%  { opacity: .4; }
-  25%  { opacity: 1; }
-  70%  { opacity: .45; }
-  90%  { opacity: .35; }
-  100% { opacity: 1; }
+  0%   { opacity: .9; }
+  25%  { opacity: .6; }
+  45%  { opacity: .2; }
+  60%  { opacity: .8; }
+  70%  { opacity: .55; }
+  80%  { opacity: .75; }
+  90% { opacity: .9; }
 }
 
 .animate-glow-reflection-off {
