@@ -32,13 +32,9 @@ body{
         height:100%;
         top:0;
 
- /*       @media(min-width: 768px){
-         
-        }
-*/
-        @media screen and (orientation:landscape) { 
-            top:-20%;
-            height:140%;
+        @media(min-width: 768px){
+            top:-10%;
+            height:120%;
         }
 
         margin:auto;
@@ -110,21 +106,21 @@ body{
 
             background:none;
             top:18%;
-            right:4%;
-            font-size:2.7vh;
+            right:5%;
+            font-size:3.2vh;
             display:inline-block;
             position:absolute;
 
             div{
                 display:inline;
-                margin-left:1.3vh;
-                margin-right:1.3vh;
+                margin-left:.9vh;
+                margin-right:.9vh;
 
                  @media(max-width: 768px){
-                    right:5%;
-                    margin-left:.95vh;
-                    margin-right:.95vh;
-                    font-size:2.1vh;
+                    right:13%;
+                    margin-left:.75vh;
+                    margin-right:.75vh;
+                    font-size:2.6vh;
                 }
     
             }
