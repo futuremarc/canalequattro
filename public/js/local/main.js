@@ -391,6 +391,7 @@ function onClick() {
         $('#tv-reflection').show()
         $('#tv-glow').show()
         $('canvas').removeClass('transparent')
+        if (isCanaleInitialized) audio.play()
 
     } else {
         $('#tv-power').hide()
@@ -399,6 +400,7 @@ function onClick() {
         $('#tv-reflection').hide()
         $('#tv-glow').hide()
         $('canvas').addClass('transparent')
+        if (isCanaleInitialized) audio.stop()
     }
 
     adjustViewspace()
