@@ -543,7 +543,7 @@ function initAudioInput() {
     audio = document.getElementById('noise-tv-on');
     audio.loop = true
     audio.volume = .45
-    initAudioNodes(audio)
+    if (!isIOS()) initAudioNodes(audio)
 
 }
 
@@ -610,10 +610,10 @@ function onDocumentLoaded() {
     $('.content').show()
     imgContainer = $('#tv-set')[0]
 
-    if (isIOS) initGenerativeNoiseInput()
-    else initAudioInput()
-
     initVideoInput();
+    initAudioInput()
+    if (isIOS()) initGenerativeNoiseInput()
+
     initCanvas();
 
 }
