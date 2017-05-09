@@ -383,6 +383,7 @@ function onClick() {
          audio.play();
          audio.pause()
          isCanaleInitialized = true
+         console.log('canale initialized')
     }
 
     isTvPowered = !isTvPowered
@@ -457,6 +458,7 @@ var getAudioInput = function() {
 function initAudioInput(){
     audio = document.querySelector('audio');
     audio.loop = true
+    audio.play()
     initAudioNodes(audio)
 }
 
