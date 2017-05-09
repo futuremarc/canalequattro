@@ -373,8 +373,17 @@ var init = function() {
 
 };
 
+var isCanaleInitialized = false
 
 function onClick() {
+
+    if (!isCanaleInitialized && video && audio){
+         video.play();
+         video.pause()
+         audio.play();
+         audio.pause()
+         isCanaleInitialized = true
+    }
 
     isTvPowered = !isTvPowered
     if (isTvPowered) {
@@ -448,7 +457,6 @@ var getAudioInput = function() {
 function initAudioInput(){
     audio = document.querySelector('audio');
     audio.loop = true
-    audio.play()
     initAudioNodes(audio)
 }
 
@@ -457,11 +465,6 @@ function initVideoInput() {
     video = document.querySelector('video');
     video.muted = true
     enableInlineVideo(video)
-
-    document.addEventListener('touchstart', function() {
-        video.play();
-        audio.play()
-    });
 
     video.width = ortho_width;
     video.height = ortho_height;
