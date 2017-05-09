@@ -381,7 +381,6 @@ function onClick() {
          video.play();
          video.pause()
          audio.play();
-         audio.pause()
          isCanaleInitialized = true
          console.log('canale initialized')
     }
@@ -458,7 +457,6 @@ var getAudioInput = function() {
 function initAudioInput(){
     audio = document.querySelector('audio');
     audio.loop = true
-    audio.play()
     initAudioNodes(audio)
 }
 
