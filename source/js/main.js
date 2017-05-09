@@ -447,7 +447,6 @@ var getAudioInput = function() {
 
 function initAudioInput(){
     audio = document.querySelector('audio');
-    audio.play()
     audio.loop = true
     initAudioNodes(audio)
 }
@@ -460,6 +459,7 @@ function initVideoInput() {
 
     document.addEventListener('touchstart', function() {
         video.play();
+        audio.play()
     });
 
     video.width = ortho_width;
