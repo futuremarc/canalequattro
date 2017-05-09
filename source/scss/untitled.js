@@ -28,7 +28,7 @@ var mic_sensitivity = 1.5,
     brightness = 0.
 
 var container
-var dates = ['8-5-2017 22:42:00 EDT', '8-5-2017 22:43:00 EDT', '8-5-2017 22:44:00 EDT', '9-5-2017 07:00:00 EDT', '9-5-2017 14:00:00 EDT', '9-5-2017 20:00:00 EDT', '9-5-2017 23:00:00 EDT'],
+var dates = ['8-5-2017 21:38:00 EDT', '7-5-2017 21:38:30 EDT', '7-5-2017 21:39:00 EDT', '9-5-2017 07:00:00 EDT', '9-5-2017 14:00:00 EDT', '9-5-2017 20:00:00 EDT', '9-5-2017 23:00:00 EDT'],
     interval = 1000,
     currentDuration,
     countdownInterval
@@ -52,7 +52,10 @@ var animate = function() {
 var render = function() {
     camera.lookAt(scene.position);
 
-    if (video.readyState === video.HAVE_ENOUGH_DATA) video_tex.needsUpdate = true;
+    if (video.readyState === video.HAVE_ENOUGH_DATA) {
+        video_tex.needsUpdate = true;
+        image_tex.needsUpdate = true
+    }
 
     if (!isVideoPlaying) {
         video_mesh_norm.visible = false
@@ -62,15 +65,15 @@ var render = function() {
     if (!isTvPowered) return
 
     if (timer === 0) $clock.removeClass('animate-glitch')
-    else if (timer === 50) $clock.addClass('animate-glitch')
-    else if (timer === 150) $clock.removeClass('animate-glitch')
-    else if (timer === 600) $clock.addClass('animate-glitch')
-    else if (timer === 700) $clock.removeClass('animate-glitch')
+        // else if (timer === 50) $clock.addClass('animate-glitch')
+        // else if (timer === 300) $clock.removeClass('animate-glitch')
+        // else if (timer === 600) $clock.addClass('animate-glitch')
+        // else if (timer === 900) $clock.removeClass('animate-glitch')
 
-    if (timer > 50 && timer < 150) isGlitch = true
-    else if (timer > 150 && timer < 600) isGlitch = false
-    else if (timer > 600 && timer < 700) isGlitch = true
-    else if (timer > 700 && timer < 1000) isGlitch = false
+    if (timer > 50 && timer < 300) isGlitch = true
+    else if (timer > 300 && timer < 600) isGlitch = false
+    else if (timer > 600 && timer < 900) isGlitch = true
+    else if (timer > 900 && timer < 1000) isGlitch = false
     else if (timer > 1000) timer = 0
 
     if (isGlitch) {
@@ -83,6 +86,8 @@ var render = function() {
         var tre = audioInput[200] / 255.;
         var mid = audioInput[100] / 255.;
         var bass = audioInput[2] / 255.;
+
+        $clock.html(tre + mid + bass)
 
         //console.log('tre : ', tre, ', mid : , ', mid, ', bass : ', bass);
 
@@ -147,10 +152,10 @@ function onInterval() {
     s = $.trim(s).length === 1 ? '0' + s : s;
 
     // show how many hours, minutes and seconds are left
-    $d.text(d);
-    $h.text(h);
-    $m.text(m);
-    $s.text(s);
+    // $d.text(d);
+    // $h.text(h);
+    // $m.text(m);
+    // $s.text(s);
 
 
     if (d < 1 && h < 1 && m < 1 && s < 1 && !isVideoPlaying) {
@@ -236,138 +241,133 @@ var init = function() {
     $h = $('<div>00</div>').appendTo($clock);
     $m = $('<div>00</div>').appendTo($clock);
     $s = $('<div>00</div>').appendTo($clock);
-
+    document.body.appendChild(container);
 
     video_tex = new THREE.Texture(video);
 
     var src = 'img/tv-screen.png'
 
-    image_tex = new THREE.TextureLoader().load(src, function() {
-        
-        document.body.appendChild(container);
-        console.log('done loading image')
-        $('.loading').hide()
-        $('.content').show()
+    image_tex = new THREE.TextureLoader().load(src);
 
-        video_tex.minFilter = THREE.LinearFilter //- to use non powers of two image
-        image_tex.minFilter = THREE.LinearFilter
+    var image = new Image();
+    image.src = src;
 
-        video_mat = new THREE.ShaderMaterial({
-            uniforms: {
-                'u_video_tex': {
-                    type: 't',
-                    value: video_tex
-                },
-                'u_image_tex': {
-                    type: 't',
-                    value: image_tex
-                },
-                'u_comp_mode': {
-                    type: 'i',
-                    value: 0
-                },
-                'u_blend_mode': {
-                    type: 'i',
-                    value: blending_mode
-                },
-                'u_buffer_2d': {
-                    type: 't',
-                    value: null
-                },
-                'u_time': {
-                    type: 'f',
-                    value: 0
-                },
-                'u_bass': {
-                    type: 'f',
-                    value: 0
-                },
-                'u_mid': {
-                    type: 'f',
-                    value: 0
-                },
-                'u_treble': {
-                    type: 'f',
-                    value: 0
-                },
-                'u_0to1': {
-                    type: 'f',
-                    value: 0
-                },
-                'u_random': {
-                    type: 'f',
-                    value: 0
-                },
-                'u_bnw': {
-                    type: 'b',
-                    value: false
-                },
-                'u_mic_sensitivity': {
-                    type: 'f',
-                    value: mic_sensitivity
-                },
-                'u_mic_compressor': {
-                    type: 'f',
-                    value: mic_compressor
-                },
-                'u_colorR': {
-                    type: 'f',
-                    value: colorR
-                },
-                'u_colorG': {
-                    type: 'f',
-                    value: colorG
-                },
-                'u_colorB': {
-                    type: 'f',
-                    value: colorB
-                },
-                'u_contrast': {
-                    type: 'f',
-                    value: contrast
-                },
-                'u_brightness': {
-                    type: 'f',
-                    value: brightness
-                }
+    video_tex.minFilter = THREE.LinearFilter //- to use non powers of two image
+    image_tex.minFilter = THREE.LinearFilter
+
+    video_mat = new THREE.ShaderMaterial({
+        uniforms: {
+            'u_video_tex': {
+                type: 't',
+                value: video_tex
             },
-            vertexShader: document.getElementById('video_vert').textContent,
-            fragmentShader: document.getElementById('video_frag').textContent,
-            blending: THREE.AdditiveBlending,
-            depthWrite: false,
-            transparent: true
-        });
-
-        video_geo = new THREE.PlaneGeometry(ortho_width, ortho_height);
-        video_mesh = new THREE.Mesh(video_geo, video_mat);
-        scene.add(video_mesh);
-
-        videos.glitch = video_mesh
-
-        video_mat_norm = new THREE.MeshBasicMaterial({
-            map: image_tex,
-            color: 0xffffff,
-            transparent: true,
-            opacity: .93,
-            depthWrite: false,
-            transparent: true
-        });
-
-        video_geo_norm = new THREE.PlaneGeometry(ortho_width, ortho_height);
-        video_mesh_norm = new THREE.Mesh(video_geo_norm, video_mat_norm);
-
-        scene.add(video_mesh_norm);
-
-        videos.norm = video_mesh_norm
-
-        scene.add(camera);
-
-        switchToImageMode()
-
-        animate();
-
+            'u_image_tex': {
+                type: 't',
+                value: image_tex
+            },
+            'u_comp_mode': {
+                type: 'i',
+                value: 0
+            },
+            'u_blend_mode': {
+                type: 'i',
+                value: blending_mode
+            },
+            'u_buffer_2d': {
+                type: 't',
+                value: null
+            },
+            'u_time': {
+                type: 'f',
+                value: 0
+            },
+            'u_bass': {
+                type: 'f',
+                value: 0
+            },
+            'u_mid': {
+                type: 'f',
+                value: 0
+            },
+            'u_treble': {
+                type: 'f',
+                value: 0
+            },
+            'u_0to1': {
+                type: 'f',
+                value: 0
+            },
+            'u_random': {
+                type: 'f',
+                value: 0
+            },
+            'u_bnw': {
+                type: 'b',
+                value: false
+            },
+            'u_mic_sensitivity': {
+                type: 'f',
+                value: mic_sensitivity
+            },
+            'u_mic_compressor': {
+                type: 'f',
+                value: mic_compressor
+            },
+            'u_colorR': {
+                type: 'f',
+                value: colorR
+            },
+            'u_colorG': {
+                type: 'f',
+                value: colorG
+            },
+            'u_colorB': {
+                type: 'f',
+                value: colorB
+            },
+            'u_contrast': {
+                type: 'f',
+                value: contrast
+            },
+            'u_brightness': {
+                type: 'f',
+                value: brightness
+            }
+        },
+        vertexShader: document.getElementById('video_vert').textContent,
+        fragmentShader: document.getElementById('video_frag').textContent,
+        blending: THREE.AdditiveBlending,
+        depthWrite: false,
+        transparent: true
     });
 
+    video_geo = new THREE.PlaneGeometry(ortho_width, ortho_height);
+    video_mesh = new THREE.Mesh(video_geo, video_mat);
+    scene.add(video_mesh);
+
+    videos.glitch = video_mesh
+
+    video_mat_norm = new THREE.MeshBasicMaterial({
+        map: image_tex,
+        color: 0xffffff,
+        transparent: true,
+        opacity: .93,
+        depthWrite: false,
+        transparent: true
+    });
+
+    video_geo_norm = new THREE.PlaneGeometry(ortho_width, ortho_height);
+    video_mesh_norm = new THREE.Mesh(video_geo_norm, video_mat_norm);
+
+    scene.add(video_mesh_norm);
+
+    videos.norm = video_mesh_norm
+
+    scene.add(camera);
+
+    switchToImageMode()
+
+    animate();
 
 };
 
@@ -378,7 +378,7 @@ function onClick() {
     if (!isCanaleInitialized && video && audio) {
         video.play();
         video.pause()
-        audio.play();
+        //audio.play();
         isCanaleInitialized = true
         console.log('canale initialized')
     }
@@ -387,28 +387,20 @@ function onClick() {
     if (isTvPowered) {
 
         timer = 0
-        $clock.removeClass('animate-glitch')
         $('#tv-power').show()
         $('#tv-standby').hide()
-        $('#tv-set').removeClass('animate-glow-reflection-off')
-        $('#tv-set').addClass('animate-glow-set')
-        $('#tv-reflection').removeClass('animate-glow-reflection-off')
-        $('#tv-reflection').addClass('animate-glow-reflection')
+        $('#tv-set').show()
+        $('#tv-reflection').show()
         $('#tv-glow').show()
         $('canvas').removeClass('transparent')
-        if (isCanaleInitialized) audio.play()
 
     } else {
-        $clock.addClass('animate-glitch')
         $('#tv-power').hide()
         $('#tv-standby').show()
-        $('#tv-set').removeClass('animate-glow-set')
-        $('#tv-set').addClass('animate-glow-reflection-off')
-        $('#tv-reflection').removeClass('animate-glow-reflection')
-        $('#tv-reflection').addClass('animate-glow-reflection-off')
+        $('#tv-set').hide()
+        $('#tv-reflection').hide()
         $('#tv-glow').hide()
         $('canvas').addClass('transparent')
-        if (isCanaleInitialized) audio.pause()
     }
 
     adjustViewspace()
@@ -434,26 +426,54 @@ function switchToVideoMode() {
 }
 
 
+
 var initAudioNodes = function(source) {
     var sampleSize = 1024;
-    var sourceNode = audioCtx.createMediaElementSource(source);
-    var filter_low = audioCtx.createBiquadFilter();
-    var filter_high = audioCtx.createBiquadFilter();
-    filter_low.frequency.value = 60.0;
-    filter_high.frequency.value = 1280.0;
-    filter_low.type = 'lowpass';
-    filter_high.type = 'highpass';
-    filter_low.Q = 10.0;
-    filter_high.Q = 1.0;
-    analyserNode.smoothingTimeConstant = 0.0;
-    analyserNode.fftSize = 1024;
 
-    sourceNode.connect(filter_low);
-    sourceNode.connect(filter_high);
-    filter_low.connect(analyserNode);
-    filter_high.connect(analyserNode);
+    xhr = new XMLHttpRequest();
 
-    audioInput = new Uint8Array(analyserNode.frequencyBinCount);
+    function reqListener() {
+        var arrayBuffer = xhr.response; // not responseText
+
+        sourceNode = audioCtx.createBufferSource();
+
+        audioCtx.decodeAudioData(arrayBuffer).then(function(decodedData) {
+
+            sourceNode.buffer = decodedData;
+
+            //sourceNode.connect(audioCtx.destination);
+            sourceNode.loop = true;
+            sourceNode.start()
+ 
+            //var sourceNode = audioCtx.createMediaElementSource(decodedData);
+            var filter_low = audioCtx.createBiquadFilter();
+            var filter_high = audioCtx.createBiquadFilter();
+            filter_low.frequency.value = 60.0;
+            filter_high.frequency.value = 1280.0;
+            filter_low.type = 'lowpass';
+            filter_high.type = 'highpass';
+            filter_low.Q = 10.0;
+            filter_high.Q = 1.0;
+            analyserNode.smoothingTimeConstant = 0.0;
+            analyserNode.fftSize = 1024;
+
+            sourceNode.connect(filter_low);
+            sourceNode.connect(filter_high);
+            filter_low.connect(analyserNode);
+            filter_high.connect(analyserNode);
+
+            audioInput = new Uint8Array(analyserNode.frequencyBinCount);
+        });
+
+    }
+
+    xhr.responseType = 'arraybuffer'
+    xhr.addEventListener("load", reqListener);
+    xhr.open("GET", "https://futuremarc.github.io/canalequattro/public/audio/noise.mp3");
+    xhr.send();
+
+
+
 };
 
 var getAudioInput = function() {
@@ -465,32 +485,10 @@ var isAudioNodesInitialized = false
 function initAudioInput() {
     audio = document.querySelector('audio');
     audio.loop = true
+
     initAudioNodes(audio)
 
 }
-
-
-function onVideoLoaded() {
-    console.log('video loaded')
-
-    countdownInterval = setInterval(onInterval, interval);
-    getCurrentCountdown(dates)
-    this.removeEventListener('loadedmetadata', onVideoLoaded)
-
-}
-
-
-function onVideoEnded() {
-    console.log('video done show countdown...')
-
-    switchToImageMode()
-    $clock.show()
-    this.currentTime = 0
-    this.addEventListener('loadedmetadata', onVideoLoaded)
-    this.load()
-    isVideoPlaying = false
-}
-
 
 function initVideoInput() {
 
@@ -501,14 +499,33 @@ function initVideoInput() {
     video.width = ortho_width;
     video.height = ortho_height;
     video.src = 'video/test.mp4'
-
-    $(video).on('ended', onVideoEnded)
-    $(video).on('loadedmetadata', onVideoLoaded)
-
     video.load()
+
+    video.onended = function() {
+        console.log('video done show countdown...')
+
+        switchToImageMode()
+        $clock.show()
+        this.currentTime = 0
+        this.addEventListener('loadedmetadata', onVideoLoaded)
+        this.load()
+        isVideoPlaying = false
+    }
+
+    video.addEventListener('loadedmetadata', onVideoLoaded)
 
 };
 
+
+function onVideoLoaded() {
+
+    console.log('video loaded')
+
+    countdownInterval = setInterval(onInterval, interval);
+    getCurrentCountdown(dates)
+    this.removeEventListener('loadedmetadata', onVideoLoaded)
+
+}
 
 
 var adjustViewspace = function() {

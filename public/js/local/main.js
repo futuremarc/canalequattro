@@ -52,10 +52,7 @@ var animate = function() {
 var render = function() {
     camera.lookAt(scene.position);
 
-    if (video.readyState === video.HAVE_ENOUGH_DATA) {
-        video_tex.needsUpdate = true;
-        image_tex.needsUpdate = true
-    }
+    if (video.readyState === video.HAVE_ENOUGH_DATA) video_tex.needsUpdate = true;
 
     if (!isVideoPlaying) {
         video_mesh_norm.visible = false
@@ -66,14 +63,14 @@ var render = function() {
 
     if (timer === 0) $clock.removeClass('animate-glitch')
     else if (timer === 50) $clock.addClass('animate-glitch')
-    else if (timer === 300) $clock.removeClass('animate-glitch')
+    else if (timer === 150) $clock.removeClass('animate-glitch')
     else if (timer === 600) $clock.addClass('animate-glitch')
-    else if (timer === 900) $clock.removeClass('animate-glitch')
+    else if (timer === 700) $clock.removeClass('animate-glitch')
 
-    if (timer > 50 && timer < 300) isGlitch = true
-    else if (timer > 300 && timer < 600) isGlitch = false
-    else if (timer > 600 && timer < 900) isGlitch = true
-    else if (timer > 900 && timer < 1000) isGlitch = false
+    if (timer > 50 && timer < 150) isGlitch = true
+    else if (timer > 150 && timer < 600) isGlitch = false
+    else if (timer > 600 && timer < 700) isGlitch = true
+    else if (timer > 700 && timer < 1000) isGlitch = false
     else if (timer > 1000) timer = 0
 
     if (isGlitch) {
@@ -239,133 +236,138 @@ var init = function() {
     $h = $('<div>00</div>').appendTo($clock);
     $m = $('<div>00</div>').appendTo($clock);
     $s = $('<div>00</div>').appendTo($clock);
-    document.body.appendChild(container);
+
 
     video_tex = new THREE.Texture(video);
 
     var src = 'img/tv-screen.png'
 
-    image_tex = new THREE.TextureLoader().load(src);
+    image_tex = new THREE.TextureLoader().load(src, function() {
+        
+        document.body.appendChild(container);
+        console.log('done loading image')
+        $('.loading').hide()
+        $('.content').show()
 
-    var image = new Image();
-    image.src = src;
+        video_tex.minFilter = THREE.LinearFilter //- to use non powers of two image
+        image_tex.minFilter = THREE.LinearFilter
 
-    video_tex.minFilter = THREE.LinearFilter //- to use non powers of two image
-    image_tex.minFilter = THREE.LinearFilter
+        video_mat = new THREE.ShaderMaterial({
+            uniforms: {
+                'u_video_tex': {
+                    type: 't',
+                    value: video_tex
+                },
+                'u_image_tex': {
+                    type: 't',
+                    value: image_tex
+                },
+                'u_comp_mode': {
+                    type: 'i',
+                    value: 0
+                },
+                'u_blend_mode': {
+                    type: 'i',
+                    value: blending_mode
+                },
+                'u_buffer_2d': {
+                    type: 't',
+                    value: null
+                },
+                'u_time': {
+                    type: 'f',
+                    value: 0
+                },
+                'u_bass': {
+                    type: 'f',
+                    value: 0
+                },
+                'u_mid': {
+                    type: 'f',
+                    value: 0
+                },
+                'u_treble': {
+                    type: 'f',
+                    value: 0
+                },
+                'u_0to1': {
+                    type: 'f',
+                    value: 0
+                },
+                'u_random': {
+                    type: 'f',
+                    value: 0
+                },
+                'u_bnw': {
+                    type: 'b',
+                    value: false
+                },
+                'u_mic_sensitivity': {
+                    type: 'f',
+                    value: mic_sensitivity
+                },
+                'u_mic_compressor': {
+                    type: 'f',
+                    value: mic_compressor
+                },
+                'u_colorR': {
+                    type: 'f',
+                    value: colorR
+                },
+                'u_colorG': {
+                    type: 'f',
+                    value: colorG
+                },
+                'u_colorB': {
+                    type: 'f',
+                    value: colorB
+                },
+                'u_contrast': {
+                    type: 'f',
+                    value: contrast
+                },
+                'u_brightness': {
+                    type: 'f',
+                    value: brightness
+                }
+            },
+            vertexShader: document.getElementById('video_vert').textContent,
+            fragmentShader: document.getElementById('video_frag').textContent,
+            blending: THREE.AdditiveBlending,
+            depthWrite: false,
+            transparent: true
+        });
 
-    video_mat = new THREE.ShaderMaterial({
-        uniforms: {
-            'u_video_tex': {
-                type: 't',
-                value: video_tex
-            },
-            'u_image_tex': {
-                type: 't',
-                value: image_tex
-            },
-            'u_comp_mode': {
-                type: 'i',
-                value: 0
-            },
-            'u_blend_mode': {
-                type: 'i',
-                value: blending_mode
-            },
-            'u_buffer_2d': {
-                type: 't',
-                value: null
-            },
-            'u_time': {
-                type: 'f',
-                value: 0
-            },
-            'u_bass': {
-                type: 'f',
-                value: 0
-            },
-            'u_mid': {
-                type: 'f',
-                value: 0
-            },
-            'u_treble': {
-                type: 'f',
-                value: 0
-            },
-            'u_0to1': {
-                type: 'f',
-                value: 0
-            },
-            'u_random': {
-                type: 'f',
-                value: 0
-            },
-            'u_bnw': {
-                type: 'b',
-                value: false
-            },
-            'u_mic_sensitivity': {
-                type: 'f',
-                value: mic_sensitivity
-            },
-            'u_mic_compressor': {
-                type: 'f',
-                value: mic_compressor
-            },
-            'u_colorR': {
-                type: 'f',
-                value: colorR
-            },
-            'u_colorG': {
-                type: 'f',
-                value: colorG
-            },
-            'u_colorB': {
-                type: 'f',
-                value: colorB
-            },
-            'u_contrast': {
-                type: 'f',
-                value: contrast
-            },
-            'u_brightness': {
-                type: 'f',
-                value: brightness
-            }
-        },
-        vertexShader: document.getElementById('video_vert').textContent,
-        fragmentShader: document.getElementById('video_frag').textContent,
-        blending: THREE.AdditiveBlending,
-        depthWrite: false,
-        transparent: true
+        video_geo = new THREE.PlaneGeometry(ortho_width, ortho_height);
+        video_mesh = new THREE.Mesh(video_geo, video_mat);
+        scene.add(video_mesh);
+
+        videos.glitch = video_mesh
+
+        video_mat_norm = new THREE.MeshBasicMaterial({
+            map: image_tex,
+            color: 0xffffff,
+            transparent: true,
+            opacity: .93,
+            depthWrite: false,
+            transparent: true
+        });
+
+        video_geo_norm = new THREE.PlaneGeometry(ortho_width, ortho_height);
+        video_mesh_norm = new THREE.Mesh(video_geo_norm, video_mat_norm);
+
+        scene.add(video_mesh_norm);
+
+        videos.norm = video_mesh_norm
+
+        scene.add(camera);
+
+        switchToImageMode()
+
+        animate();
+
     });
 
-    video_geo = new THREE.PlaneGeometry(ortho_width, ortho_height);
-    video_mesh = new THREE.Mesh(video_geo, video_mat);
-    scene.add(video_mesh);
-
-    videos.glitch = video_mesh
-
-    video_mat_norm = new THREE.MeshBasicMaterial({
-        map: image_tex,
-        color: 0xffffff,
-        transparent: true,
-        opacity: .93,
-        depthWrite: false,
-        transparent: true
-    });
-
-    video_geo_norm = new THREE.PlaneGeometry(ortho_width, ortho_height);
-    video_mesh_norm = new THREE.Mesh(video_geo_norm, video_mat_norm);
-
-    scene.add(video_mesh_norm);
-
-    videos.norm = video_mesh_norm
-
-    scene.add(camera);
-
-    switchToImageMode()
-
-    animate();
 
 };
 
@@ -385,22 +387,28 @@ function onClick() {
     if (isTvPowered) {
 
         timer = 0
+        $clock.removeClass('animate-glitch')
         $('#tv-power').show()
         $('#tv-standby').hide()
-        $('#tv-set').show()
-        $('#tv-reflection').show()
+        $('#tv-set').removeClass('animate-glow-reflection-off')
+        $('#tv-set').addClass('animate-glow-set')
+        $('#tv-reflection').removeClass('animate-glow-reflection-off')
+        $('#tv-reflection').addClass('animate-glow-reflection')
         $('#tv-glow').show()
         $('canvas').removeClass('transparent')
         if (isCanaleInitialized) audio.play()
 
     } else {
+        $clock.addClass('animate-glitch')
         $('#tv-power').hide()
         $('#tv-standby').show()
-        $('#tv-set').hide()
-        $('#tv-reflection').hide()
+        $('#tv-set').removeClass('animate-glow-set')
+        $('#tv-set').addClass('animate-glow-reflection-off')
+        $('#tv-reflection').removeClass('animate-glow-reflection')
+        $('#tv-reflection').addClass('animate-glow-reflection-off')
         $('#tv-glow').hide()
         $('canvas').addClass('transparent')
-        if (isCanaleInitialized) audio.stop()
+        if (isCanaleInitialized) audio.pause()
     }
 
     adjustViewspace()

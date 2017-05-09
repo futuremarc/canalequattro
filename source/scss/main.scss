@@ -48,6 +48,10 @@ body{
 
     }
 
+    .content{
+        display: none;
+    }
+
 
     .highIndex{
         z-index: 15;
@@ -61,13 +65,8 @@ body{
         z-index:15;
     }
 
-    #tv-reflection{
-        display:none;
-    }
-
     #tv-set{
         z-index:15;
-        display: none;
     }
 
     #tv-glow{
@@ -228,6 +227,19 @@ body{
   100% { opacity: 1; }
 }
 
+.animate-glow-reflection-off {
+    animation: glowAnimReflectionOff 10s infinite;
+}
+
+@keyframes glowAnimReflectionOff {
+  0%   { opacity: .13; }
+  20%  { opacity: .07; }
+  25%  { opacity: .1; }
+  70%  { opacity: .19; }
+  100% { opacity: .13; }
+}
+
+
 .animate-glow-set {
     animation: glowAnimSet 10s infinite;
 }
@@ -243,40 +255,47 @@ body{
 
 
 
-/*
-
-.clock:after{
-    content:attr(data-text);
-    position:absolute;
-    left:2px;
-    text-shadow:-1px 0 red;
-    top:0;
-    color:white;
-    background:none;
-    overflow:hidden;
-    clip:rect(0,900px,0,0); 
-    animation:noiseAnim 2s infinite linear alternate-reverse;
-    font-size:1.5vh;
-    display:inline;
-    margin-left:1vh;
-    margin-right:1vh;
-
+body{
+  display: flex;
+  height: 100vh;
+  justify-content: center;
+  align-items: center;
+  background-color: #000;
 }
-.clock:before{
+
+
+.loading{
+  color:white;
+  font-size:100px;
+  position:relative;
+  width:400px;
+  margin:0 auto;
+}
+
+.loading:after{
+  content:attr(data-text);
+  position:absolute;
+  left:2px;
+  text-shadow:-1px 0 red;
+  top:0;
+  color:white;
+  background:black;
+  overflow:hidden;
+  clip:rect(0,900px,0,0); 
+  animation:noiseAnim 2s infinite linear alternate-reverse;
+}
+
+
+.loading:before{
   content:attr(data-text);
   position:absolute;
   left:-2px;
   text-shadow:1px 0 blue; 
   top:0;
   color:white;
-  background:none;
+  background:black;
   overflow:hidden;
   clip:rect(0,900px,0,0); 
   animation:noiseAnim2 3s infinite linear alternate-reverse;
-  display:inline;
-  margin-left:1vh;
-  margin-right:1vh;
-  font-size:1.5vh;
 }
 
-*/
