@@ -72,10 +72,14 @@ body{
     #tv-glow{
        display: none;
        width:auto;
-       height:140%;
+       height:100%;
+       
+       @media(min-width: 768px){
+            
+            height:140%;
+            top:0;
+            bottom:0;
 
-       @media(max-width: 768px){
-            height:100%;
         }
 
     }
