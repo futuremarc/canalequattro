@@ -6,7 +6,7 @@ var bufferLength = analyserNode.frequencyBinCount;
 var audioInput = new Uint8Array(bufferLength);
 
 var scene, buffer_scene, camera, buffer_cam, renderer, container;
-var image_tex, video, audio, buffer, pre_video_tex, video_tex, video_mat, video_mesh, video_geo, buffer_mat, buffer_geo, buffer_mesh, video_tex_norm, video_mat_norm, video_mesh_norm, video_geo_norm;
+var image_tex, video, audio, audioTvOff, buffer, pre_video_tex, video_tex, video_mat, video_mesh, video_geo, buffer_mat, buffer_geo, buffer_mesh, video_tex_norm, video_mat_norm, video_mesh_norm, video_geo_norm;
 var ortho_width = 1920,
     ortho_height = 1080,
     ortho_near = -1,
@@ -49,6 +49,17 @@ var animate = function() {
 };
 
 
+
+var beat = 200;
+var volume = 1;
+var curveNumber = -3
+
+setInterval(function() {
+    beat = 60 + Math.random()*100;
+    volume = Math.min(1,Math.max(0.1,volume + Math.random()-0.5));
+}, 200);
+
+
 var render = function() {
     camera.lookAt(scene.position);
 
@@ -61,17 +72,37 @@ var render = function() {
 
     if (!isTvPowered) return
 
+    curveNumber++
+    if (curveNumber > 6) curveNumber = -3
+
+    var curving = Math.max(1, 30*Math.abs(curveNumber));
+    curving = curving + 100*volume;
+ 
+    var height = Math.max(1,Math.min(curving, 240) + (Math.random()*50-25));
+
+
     if (timer === 0) $clock.removeClass('animate-glitch')
     else if (timer === 50) $clock.addClass('animate-glitch')
     else if (timer === 150) $clock.removeClass('animate-glitch')
     else if (timer === 600) $clock.addClass('animate-glitch')
     else if (timer === 700) $clock.removeClass('animate-glitch')
 
-    if (timer > 50 && timer < 150) isGlitch = true
-    else if (timer > 150 && timer < 600) isGlitch = false
-    else if (timer > 600 && timer < 700) isGlitch = true
-    else if (timer > 700 && timer < 1000) isGlitch = false
-    else if (timer > 1000) timer = 0
+    if (timer > 50 && timer < 150) {
+        isGlitch = true
+        audio.play();
+    } else if (timer > 150 && timer < 600) {
+        isGlitch = false
+        audio.pause();
+    } else if (timer > 600 && timer < 700) {
+        isGlitch = true
+        audio.play();
+    } else if (timer > 700 && timer < 1000) {
+        isGlitch = false
+        audio.pause();
+    } else if (timer > 1000) {
+        timer = 0
+        audio.play();
+    }
 
     if (isGlitch) {
 
@@ -80,9 +111,13 @@ var render = function() {
         video_mesh.visible = true
 
 
-        var tre = audioInput[200] / 255.;
-        var mid = audioInput[100] / 255.;
-        var bass = audioInput[2] / 255.;
+        // var tre = audioInput[200] / 255.;
+        // var mid = audioInput[100] / 255.;
+        // var bass = audioInput[2] / 255.;
+        
+        var tre = height / 255.;
+        var mid = height / 255.;
+        var bass = height / 255.;
 
         //console.log('tre : ', tre, ', mid : , ', mid, ', bass : ', bass);
 
@@ -243,7 +278,7 @@ var init = function() {
     var src = 'img/tv-screen.png'
 
     image_tex = new THREE.TextureLoader().load(src, function() {
-        
+
         document.body.appendChild(container);
         console.log('done loading image')
         $('.loading').hide()
@@ -396,7 +431,10 @@ function onClick() {
         $('#tv-reflection').addClass('animate-glow-reflection')
         $('#tv-glow').show()
         $('canvas').removeClass('transparent')
-        if (isCanaleInitialized) audio.play()
+        if (isCanaleInitialized){
+            audio.play()
+            audioTvOff.pause()
+        }
 
     } else {
         $clock.addClass('animate-glitch')
@@ -408,7 +446,10 @@ function onClick() {
         $('#tv-reflection').addClass('animate-glow-reflection-off')
         $('#tv-glow').hide()
         $('canvas').addClass('transparent')
-        if (isCanaleInitialized) audio.pause()
+        if (isCanaleInitialized){
+            audioTvOff.play()
+            audio.pause()
+        }
     }
 
     adjustViewspace()
@@ -452,6 +493,7 @@ var initAudioNodes = function(source) {
     sourceNode.connect(filter_high);
     filter_low.connect(analyserNode);
     filter_high.connect(analyserNode);
+    analyserNode.connect(audioCtx.destination)
 
     audioInput = new Uint8Array(analyserNode.frequencyBinCount);
 };
@@ -463,8 +505,15 @@ var getAudioInput = function() {
 var isAudioNodesInitialized = false
 
 function initAudioInput() {
-    audio = document.querySelector('audio');
+
+    audioTvOff = document.getElementById('noise-tv-off');
+    audioTvOff.loop = true
+    audioTvOff.volume = .35
+    audioTvOff.play()
+
+    audio = document.getElementById('noise-tv-on');
     audio.loop = true
+    audio.volume = .6
     initAudioNodes(audio)
 
 }
