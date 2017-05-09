@@ -530,7 +530,14 @@ function onDocumentLoaded() {
     init();
 }
 
+document.ontouchmove = function (e) {
+  e.preventDefault();
+}
 
+// Enable scrolling.
+document.ontouchmove = function (e) {
+  return true;
+}
 document.addEventListener('DOMContentLoaded', onDocumentLoaded);
 window.addEventListener('resize', adjustViewspace, false);
 $(document).click(onClick)

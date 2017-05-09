@@ -20,7 +20,7 @@ body{
         color:  rgba(255,255,255,.7);
 		font-family: 'VCR_OSD_MONO_1';
         user-select: none;
-        overflow:hidden;
+        overflow: hidden;
         -moz-user-select: none;
         -khtml-user-select: none;
         -webkit-user-select: none;
@@ -89,7 +89,7 @@ body{
 
         @media(max-width: 768px){
             height:35%;
-            top:-5%;
+            top:-6%;
         }
     
         .clock{
