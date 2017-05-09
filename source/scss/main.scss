@@ -32,12 +32,12 @@ body{
         height:100%;
         top:0;
 
-        @media(min-width: 768px){
+ /*       @media(min-width: 768px){
          
         }
-
+*/
         @media screen and (orientation:landscape) { 
-            top:-10%;
+            top:-20%;
             height:140%;
         }
 
@@ -78,45 +78,58 @@ body{
        width:auto;
        height:100%;
        
-       @media(min-width: 768px){
+   /*    @media(min-width: 768px){
             
             height:140%;
             top:0;
             bottom:0;
 
         }
+*/
+        @media screen and (orientation:landscape) { 
+            height:140%;
+            top:0;
+            bottom:0;
+        }
 
     }
 
     #canale-container{
 
-        width:45%;
-        height:43%;
+
+        
         margin:auto;
+        height:35%;
+        top:-7%;
         left:0;
         right:0;
         bottom:0;
         top:-10%;
+
         position: absolute;
 
         @media(max-width: 768px){
-            height:35%;
-            top:-7%;
+            
+        }
+
+         @media screen and (orientation:landscape) { 
+            width:45%;
+            height:49%;
         }
     
         .clock{
 
             background:none;
             top:18%;
-            right:4%;
-            font-size:2.7vh;
+            right:4.5%;
+            font-size:3.5vh;
             display:inline-block;
             position:absolute;
 
             div{
                 display:inline;
-                margin-left:1.3vh;
-                margin-right:1.3vh;
+                margin-left:1.2vh;
+                margin-right:1.2vh;
 
                  @media(max-width: 768px){
                     right:5%;
@@ -312,6 +325,6 @@ body{
   background:black;
   overflow:hidden;
   clip:rect(0,900px,0,0); 
-  animation:noiseAnim2 3s infinite linear alternate-reverse;
+  animation:noiseAnim2 1s infinite linear alternate-reverse;
 }
 
