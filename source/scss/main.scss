@@ -33,6 +33,10 @@ body{
         top:0;
 
         @media(min-width: 768px){
+         
+        }
+
+        @media screen and (orientation:landscape) { 
             top:-10%;
             height:120%;
         }
@@ -224,6 +228,7 @@ body{
   70%  { opacity: .8; }
   100% { opacity: .55; }
 }
+
 
 
 .animate-glow-reflection {
