@@ -28,7 +28,7 @@ var mic_sensitivity = 1.5,
     brightness = 0.
 
 var container
-var dates = ['8-5-2017 21:38:00 EDT', '7-5-2017 21:38:30 EDT', '7-5-2017 21:39:00 EDT', '9-5-2017 07:00:00 EDT', '9-5-2017 14:00:00 EDT', '9-5-2017 20:00:00 EDT', '9-5-2017 23:00:00 EDT'],
+var dates = ['8-5-2017 22:33:00 EDT', '7-5-2017 22:33:30 EDT', '7-5-2017 22:34:00 EDT', '9-5-2017 07:00:00 EDT', '9-5-2017 14:00:00 EDT', '9-5-2017 20:00:00 EDT', '9-5-2017 23:00:00 EDT'],
     interval = 1000,
     currentDuration,
     countdownInterval
@@ -65,10 +65,10 @@ var render = function() {
     if (!isTvPowered) return
 
     if (timer === 0) $clock.removeClass('animate-glitch')
-        // else if (timer === 50) $clock.addClass('animate-glitch')
-        // else if (timer === 300) $clock.removeClass('animate-glitch')
-        // else if (timer === 600) $clock.addClass('animate-glitch')
-        // else if (timer === 900) $clock.removeClass('animate-glitch')
+    // else if (timer === 50) $clock.addClass('animate-glitch')
+    // else if (timer === 300) $clock.removeClass('animate-glitch')
+    // else if (timer === 600) $clock.addClass('animate-glitch')
+    // else if (timer === 900) $clock.removeClass('animate-glitch')
 
     if (timer > 50 && timer < 300) isGlitch = true
     else if (timer > 300 && timer < 600) isGlitch = false
@@ -378,7 +378,7 @@ function onClick() {
     if (!isCanaleInitialized && video && audio) {
         video.play();
         video.pause()
-        //audio.play();
+        audio.play();
         isCanaleInitialized = true
         console.log('canale initialized')
     }
@@ -426,54 +426,26 @@ function switchToVideoMode() {
 }
 
 
-
 var initAudioNodes = function(source) {
     var sampleSize = 1024;
+    var sourceNode = audioCtx.createMediaElementSource(source);
+    var filter_low = audioCtx.createBiquadFilter();
+    var filter_high = audioCtx.createBiquadFilter();
+    filter_low.frequency.value = 60.0;
+    filter_high.frequency.value = 1280.0;
+    filter_low.type = 'lowpass';
+    filter_high.type = 'highpass';
+    filter_low.Q = 10.0;
+    filter_high.Q = 1.0;
+    analyserNode.smoothingTimeConstant = 0.0;
+    analyserNode.fftSize = 1024;
 
-    xhr = new XMLHttpRequest();
+    sourceNode.connect(filter_low);
+    sourceNode.connect(filter_high);
+    filter_low.connect(analyserNode);
+    filter_high.connect(analyserNode);
 
-    function reqListener() {
-        var arrayBuffer = xhr.response; // not responseText
-
-        sourceNode = audioCtx.createBufferSource();
-
-        audioCtx.decodeAudioData(arrayBuffer).then(function(decodedData) {
-
-            sourceNode.buffer = decodedData;
-
-            //sourceNode.connect(audioCtx.destination);
-            sourceNode.loop = true;
-            sourceNode.start()
- 
-            //var sourceNode = audioCtx.createMediaElementSource(decodedData);
-            var filter_low = audioCtx.createBiquadFilter();
-            var filter_high = audioCtx.createBiquadFilter();
-            filter_low.frequency.value = 60.0;
-            filter_high.frequency.value = 1280.0;
-            filter_low.type = 'lowpass';
-            filter_high.type = 'highpass';
-            filter_low.Q = 10.0;
-            filter_high.Q = 1.0;
-            analyserNode.smoothingTimeConstant = 0.0;
-            analyserNode.fftSize = 1024;
-
-            sourceNode.connect(filter_low);
-            sourceNode.connect(filter_high);
-            filter_low.connect(analyserNode);
-            filter_high.connect(analyserNode);
-
-            audioInput = new Uint8Array(analyserNode.frequencyBinCount);
-        });
-
-    }
-
-    xhr.responseType = 'arraybuffer'
-    xhr.addEventListener("load", reqListener);
-    xhr.open("GET", "https://futuremarc.github.io/canalequattro/public/audio/noise.mp3");
-    xhr.send();
-
-
-
+    audioInput = new Uint8Array(analyserNode.frequencyBinCount);
 };
 
 var getAudioInput = function() {
@@ -485,7 +457,6 @@ var isAudioNodesInitialized = false
 function initAudioInput() {
     audio = document.querySelector('audio');
     audio.loop = true
-
     initAudioNodes(audio)
 
 }
@@ -558,8 +529,8 @@ function onDocumentLoaded() {
     init();
 }
 
-document.ontouchmove = function(e) {
-    e.preventDefault();
+document.ontouchmove = function (e) {
+  e.preventDefault();
 }
 
 
