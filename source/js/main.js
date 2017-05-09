@@ -65,10 +65,10 @@ var render = function() {
     if (!isTvPowered) return
 
     if (timer === 0) $clock.removeClass('animate-glitch')
-    // else if (timer === 50) $clock.addClass('animate-glitch')
-    // else if (timer === 300) $clock.removeClass('animate-glitch')
-    // else if (timer === 600) $clock.addClass('animate-glitch')
-    // else if (timer === 900) $clock.removeClass('animate-glitch')
+        // else if (timer === 50) $clock.addClass('animate-glitch')
+        // else if (timer === 300) $clock.removeClass('animate-glitch')
+        // else if (timer === 600) $clock.addClass('animate-glitch')
+        // else if (timer === 900) $clock.removeClass('animate-glitch')
 
     if (timer > 50 && timer < 300) isGlitch = true
     else if (timer > 300 && timer < 600) isGlitch = false
@@ -426,26 +426,54 @@ function switchToVideoMode() {
 }
 
 
+
 var initAudioNodes = function(source) {
     var sampleSize = 1024;
-    var sourceNode = audioCtx.createMediaElementSource(source);
-    var filter_low = audioCtx.createBiquadFilter();
-    var filter_high = audioCtx.createBiquadFilter();
-    filter_low.frequency.value = 60.0;
-    filter_high.frequency.value = 1280.0;
-    filter_low.type = 'lowpass';
-    filter_high.type = 'highpass';
-    filter_low.Q = 10.0;
-    filter_high.Q = 1.0;
-    analyserNode.smoothingTimeConstant = 0.0;
-    analyserNode.fftSize = 1024;
 
-    sourceNode.connect(filter_low);
-    sourceNode.connect(filter_high);
-    filter_low.connect(analyserNode);
-    filter_high.connect(analyserNode);
+    xhr = new XMLHttpRequest();
 
-    audioInput = new Uint8Array(analyserNode.frequencyBinCount);
+    function reqListener() {
+        var arrayBuffer = xhr.response; // not responseText
+
+        sourceNode = audioCtx.createBufferSource();
+
+        audioCtx.decodeAudioData(arrayBuffer).then(function(decodedData) {
+
+            sourceNode.buffer = decodedData;
+
+            //sourceNode.connect(audioCtx.destination);
+            sourceNode.loop = true;
+            sourceNode.start()
+ 
+            //var sourceNode = audioCtx.createMediaElementSource(decodedData);
+            var filter_low = audioCtx.createBiquadFilter();
+            var filter_high = audioCtx.createBiquadFilter();
+            filter_low.frequency.value = 60.0;
+            filter_high.frequency.value = 1280.0;
+            filter_low.type = 'lowpass';
+            filter_high.type = 'highpass';
+            filter_low.Q = 10.0;
+            filter_high.Q = 1.0;
+            analyserNode.smoothingTimeConstant = 0.0;
+            analyserNode.fftSize = 1024;
+
+            sourceNode.connect(filter_low);
+            sourceNode.connect(filter_high);
+            filter_low.connect(analyserNode);
+            filter_high.connect(analyserNode);
+
+            audioInput = new Uint8Array(analyserNode.frequencyBinCount);
+        });
+
+    }
+
+    xhr.responseType = 'arraybuffer'
+    xhr.addEventListener("load", reqListener);
+    xhr.open("GET", "/audio/noise.mp3");
+    xhr.send();
+
+
+
 };
 
 var getAudioInput = function() {
@@ -457,6 +485,7 @@ var isAudioNodesInitialized = false
 function initAudioInput() {
     audio = document.querySelector('audio');
     audio.loop = true
+
     initAudioNodes(audio)
 
 }
@@ -529,8 +558,8 @@ function onDocumentLoaded() {
     init();
 }
 
-document.ontouchmove = function (e) {
-  e.preventDefault();
+document.ontouchmove = function(e) {
+    e.preventDefault();
 }
 
 
