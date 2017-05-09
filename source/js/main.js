@@ -599,7 +599,7 @@ var adjustViewspace = function() {
 };
 
 function isIOS(){
-    return iOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream
+    return /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream
 }
 
 function onDocumentLoaded() {
