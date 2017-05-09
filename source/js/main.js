@@ -1,7 +1,5 @@
 $(document).ready(function() {})
 
-navigator.getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia;
-
 var audioCtx = new(window.AudioContext || window.webkitAudioContext || window.mozAudioContext || window.msAudioContext)();
 var analyserNode = audioCtx.createAnalyser();
 var bufferLength = analyserNode.frequencyBinCount;
@@ -41,8 +39,6 @@ var rendererToImageRatio = 2.1,
     isTvPowered = false,
     imgContainer,
     videos = {}
-
-
 
 
 
@@ -377,12 +373,12 @@ var isCanaleInitialized = false
 
 function onClick() {
 
-    if (!isCanaleInitialized && video && audio){
-         video.play();
-         video.pause()
-         audio.play();
-         isCanaleInitialized = true
-         console.log('canale initialized')
+    if (!isCanaleInitialized && video && audio) {
+        video.play();
+        video.pause()
+        audio.play();
+        isCanaleInitialized = true
+        console.log('canale initialized')
     }
 
     isTvPowered = !isTvPowered
@@ -454,10 +450,16 @@ var getAudioInput = function() {
     analyserNode.getByteFrequencyData(audioInput);
 };
 
-function initAudioInput(){
+var isAudioNodesInitialized = false
+
+function initAudioInput() {
     audio = document.querySelector('audio');
     audio.loop = true
-    initAudioNodes(audio)
+    audio.addEventListener('canplay', function() {
+        if (!isAudioNodesInitialized) initAudioNodes(audio)
+        isAudioNodesInitialized = true
+    })
+
 }
 
 function initVideoInput() {
@@ -532,6 +534,3 @@ function onDocumentLoaded() {
 document.addEventListener('DOMContentLoaded', onDocumentLoaded);
 window.addEventListener('resize', adjustViewspace, false);
 $(document).click(onClick)
-
-
-
