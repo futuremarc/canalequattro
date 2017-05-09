@@ -71,8 +71,13 @@ body{
 
     #tv-glow{
        display: none;
-       height:auto;
-       width:120%;
+       width:auto;
+       height:140%;
+
+       @media(max-width: 768px){
+            height:100%;
+        }
+
     }
 
     #canale-container{
