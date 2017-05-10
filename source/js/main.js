@@ -463,6 +463,7 @@ var initCanvas = function() {
 };
 
 var isCanaleInitialized = false
+var $clock
 
 function showScene() {
 
@@ -490,6 +491,8 @@ function hideScene() {
 }
 
 function onDocumentClick() {
+
+    if (!$clock) return
 
     if (!isCanaleInitialized && video && audio) {
 
