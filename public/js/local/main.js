@@ -89,7 +89,7 @@ function playOsc(startTime, endTime) {
     osc.frequency.value = 440;
 
     var gainNode = audioCtx.createGain();
-    gainNode.gain.value = .1
+    gainNode.gain.value = .05
     osc.connect(gainNode).connect(audioCtx.destination);
 
     osc.start(startTime);
@@ -99,9 +99,9 @@ function playOsc(startTime, endTime) {
 
 function playCountdownSound() {
 
-    playOsc(audioCtx.currentTime, audioCtx.currentTime + 0.5);
-    playOsc(audioCtx.currentTime + 1.5, audioCtx.currentTime + 2);
-    playOsc(audioCtx.currentTime + 3, audioCtx.currentTime + 3.5);
+    playOsc(audioCtx.currentTime, audioCtx.currentTime + 0.25);
+    playOsc(audioCtx.currentTime + 1, audioCtx.currentTime + 1.25);
+    playOsc(audioCtx.currentTime + 2, audioCtx.currentTime + 2.25);
 
 
 }
@@ -585,12 +585,12 @@ function initAudioInput() {
 
     audioTvOff = document.getElementById('noise-tv-off');
     audioTvOff.loop = true
-    audioTvOff.volume = .11
+    audioTvOff.volume = .1
     audioTvOff.play()
 
     audio = document.getElementById('noise-tv-on');
     audio.loop = true
-    audio.volume = .22
+    audio.volume = .16
     if (!isIOS()) initAudioNodes(audio)
 
 }

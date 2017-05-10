@@ -33,8 +33,8 @@ body{
         top:0;
 
         @media(min-width: 768px){
-            top:-10%;
-            height:120%;
+            top:-30%;
+            height:160%;
         }
 
         margin:auto;
@@ -120,6 +120,15 @@ body{
             height:65%;
             top:-14%;
         }
+
+
+       @media(min-width: 768px){
+            
+            height:57%;
+            top:-12%;
+
+        }
+
     
         .clock{
 
@@ -141,6 +150,13 @@ body{
                 top:19%;
                 right:5%;
             }
+
+             @media(min-width: 768px){
+            
+            top:19%;
+            right:5%;
+            font-size:4.1vh;
+        }
             
 
             div{
@@ -161,7 +177,14 @@ body{
                     margin-right:1.5vh;
                     right:7%;
                 }
-            
+
+
+                @media(min-width: 768px){
+                    margin-left:1.21vh;
+                    margin-right:1.21vh;
+
+                }
+                    
     
             }
 
