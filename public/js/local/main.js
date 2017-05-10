@@ -1,21 +1,4 @@
-//var dates = ['9-5-2017 01:40:00 EDT', '9-5-2017 01:45:00 EDT', '9-5-2017 01:50:00 EDT', '9-5-2017 07:00:00 EDT', '9-5-2017 14:00:00 EDT', '9-5-2017 20:00:00 EDT', '9-5-2017 23:00:00 EDT', '10-5-2017 07:00:00 EDT', '10-5-2017 14:00:00 EDT', '10-5-2017 20:00:00 EDT', '10-5-2017 23:00:00 EDT']
-var dates = []
-var hour = 0
-var minute = 0
-var pace = 10
-
-for (var i = 0; i < 24; i++){
-
-    hour++
-
-    for (var j = 0; j < 60/pace; j++){
-        minute += pace
-        var date = '10-5-2017 ' + hour + ':' + minute +':00 EDT'
-        dates.push(date)
-    }
-
-    minute = 0
-}
+var dates = ['11-5-2017 07:00:00 EDT', '11-5-2017 14:00:00 EDT', '11-5-2017 20:00:00 EDT', '11-5-2017 23:00:00 EDT']
 
 var audioCtx = new(window.AudioContext || window.webkitAudioContext || window.mozAudioContext || window.msAudioContext)();
 var analyserNode = audioCtx.createAnalyser();
@@ -228,6 +211,8 @@ var render = function() {
 };
 
 
+var isCountdownInitialized = false
+
 function onCountdownInterval() {
 
     currentDuration = moment.duration(currentDuration.asMilliseconds() - interval, 'milliseconds');
@@ -248,11 +233,13 @@ function onCountdownInterval() {
     $m.text(m);
     $s.text(s);
 
+    isCountdownInitialized = true
+
     if (d < 1 && h < 1 && m < 1 && s < 5 && s > 3 && !isVideoPlaying && isTvPowered) playCountdownSound()
 
     if (d < 1 && h < 1 && m < 1 && s < 1 && !isVideoPlaying) {
 
-        console.log('video play from beginning...')
+        console.log('play video from beginning...')
 
         $clock.hide()
         switchToVideoMode()
@@ -284,7 +271,7 @@ function getCurrentCountdown(dates) {
 
         if (diffTime < 0 && diffTime > -video.duration + 1) {
 
-            console.log('video play from', diffTime * -1)
+            console.log('play video from', diffTime * -1)
             switchToVideoMode()
             $clock.hide()
             currentCountdown = diffTime
@@ -327,13 +314,13 @@ var initCanvas = function() {
     renderer.setSize(container.offsetWidth, container.offsetHeight);
 
     container.appendChild(renderer.domElement);
-    $clock = $('<div class="clock animate-glitch"></div>').appendTo(container)
+    $clock = $('<div class="clock"></div>').appendTo(container)
 
 
-    $d = $('<div>00</div>').appendTo($clock); //use spaces as placeholders for numbers
-    $h = $('<div>00</div>').appendTo($clock);
-    $m = $('<div>00</div>').appendTo($clock);
-    $s = $('<div>00</div>').appendTo($clock);
+    $d = $('<div></div>').appendTo($clock); //use spaces as placeholders for numbers
+    $h = $('<div></div>').appendTo($clock);
+    $m = $('<div></div>').appendTo($clock);
+    $s = $('<div></div>').appendTo($clock);
 
 
     video_tex = new THREE.Texture(video);
@@ -456,6 +443,8 @@ var initCanvas = function() {
 
         switchToImageMode()
         $(document).click(onDocumentClick)
+        $('.loading').hide()
+        $('.content').show()
         animate();
     });
 
@@ -467,7 +456,7 @@ var $clock
 
 function showScene() {
 
-    $clock.removeClass('animate-glitch')
+    if (!isVideoPlaying) $clock.show()
     $('#tv-power').show()
     $('#tv-standby').hide()
     $('#tv-set').removeClass('animate-glow-reflection-off')
@@ -480,7 +469,7 @@ function showScene() {
 
 function hideScene() {
 
-    $clock.addClass('animate-glitch')
+    $clock.hide()
     $('#tv-power').hide()
     $('#tv-standby').show()
     $('#tv-set').addClass('animate-glow-reflection-off')
@@ -491,8 +480,6 @@ function hideScene() {
 }
 
 function onDocumentClick() {
-
-    if (!$clock) return
 
     if (!isCanaleInitialized && video && audio) {
 
@@ -513,7 +500,7 @@ function onDocumentClick() {
         if (isCanaleInitialized) {
             audioTvOff.pause()
             video.muted = false
-            
+
             if (isVideoPlaying) audio.pause()
             else audio.play()
         }
@@ -596,7 +583,7 @@ function initAudioInput() {
 
     audio = document.getElementById('noise-tv-on');
     audio.loop = true
-    audio.volume = .16
+    audio.volume = .1
     if (!isIOS()) initAudioNodes(audio)
 
 }
@@ -660,14 +647,10 @@ function isIOS() {
 
 function onDocumentLoaded() {
 
-    $('.loading').hide()
-    $('.content').show()
     imgContainer = $('#tv-set')[0]
-
     initVideoInput();
     initAudioInput()
     if (isIOS()) initGenerativeNoiseInput()
-
     initCanvas();
 
 }
@@ -676,12 +659,28 @@ document.ontouchmove = function(e) {
     e.preventDefault();
 }
 
+var hour = 0
+var minute = 0
+var pace = 10
+
+function initSchedule() {
+
+    for (var i = 0; i < 24; i++) {
+
+        hour++
+        for (var j = 0; j < 60 / pace; j++) {
+            minute += pace
+            var date = '10-5-2017 ' + hour + ':' + minute + ':00 EDT'
+            dates.push(date)
+        }
+        minute = 0
+    }
+}
+
 var everythingLoaded = setInterval(function() {
     if (/complete/.test(document.readyState)) {
         clearInterval(everythingLoaded);
         onDocumentLoaded()
+        window.addEventListener('resize', adjustViewspace, false);
     }
 }, 10);
-
-
-window.addEventListener('resize', adjustViewspace, false);

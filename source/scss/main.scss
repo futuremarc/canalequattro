@@ -82,7 +82,7 @@ body{
        
        @media(min-width: 768px){
             
-            height:140%;
+            height:170%;
             top:0;
             bottom:0;
 
@@ -138,6 +138,7 @@ body{
             font-size:3.5vh;
             display:inline-block;
             position:absolute;
+            display:none;
 
             @media(max-width: 768px){
                 font-size:3.5vh;
