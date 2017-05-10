@@ -1,12 +1,5 @@
 var dates = ['11-5-2017 07:00:00 EDT', '11-5-2017 14:00:00 EDT', '11-5-2017 20:00:00 EDT', '11-5-2017 23:00:00 EDT']
 
-var audioCtx = new(window.AudioContext || window.webkitAudioContext || window.mozAudioContext || window.msAudioContext)();
-
-
-var analyserNode = audioCtx.createAnalyser();
-var bufferLength = analyserNode.frequencyBinCount;
-var audioInput = new Uint8Array(bufferLength);
-
 var scene, buffer_scene, camera, buffer_cam, renderer, container;
 var image_tex, video, audio, audioTvOff, buffer, pre_video_tex, video_tex, video_mat, video_mesh, video_geo, buffer_mat, buffer_geo, buffer_mesh, video_tex_norm, video_mat_norm, video_mesh_norm, video_geo_norm;
 
@@ -61,12 +54,12 @@ function isWebGLAvailable() {
     try {
         var canvas = document.createElement("canvas");
         return !!
-            window.WebGLRenderingContext && 
-            (canvas.getContext("webgl") || 
+            window.WebGLRenderingContext &&
+            (canvas.getContext("webgl") ||
                 canvas.getContext("experimental-webgl"));
-    } catch(e) { 
+    } catch (e) {
         return false;
-    } 
+    }
 }
 
 
@@ -546,8 +539,16 @@ function switchToVideoMode() {
     image_tex.needsUpdate = true
 }
 
+var audioCtx, analyserNode, bufferLength, audioInput, audioEnv
 
 var initAudioNodes = function(source) {
+
+    audioEnv = window.AudioContext || window.webkitAudioContext || window.mozAudioContext || window.msAudioContext
+    audioCtx = new env();
+    analyserNode = audioCtx.createAnalyser();
+    bufferLength = analyserNode.frequencyBinCount;
+    audioInput = new Uint8Array(bufferLength);
+
 
     var sampleSize = 1024;
     var sourceNode = audioCtx.createMediaElementSource(source);
@@ -656,7 +657,7 @@ var $d, $h, $m, $s
 function onDocumentLoaded() {
 
     imgContainer = $('#tv-set')[0]
-    
+
     container = document.getElementById('canale-container')
     $clock = $('<div class="clock"></div>').appendTo(container)
 
