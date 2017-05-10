@@ -456,7 +456,7 @@ var initCanvas = function() {
 
         switchToImageMode()
         animate();
-
+        $(document).click(onDocumentClick)
     });
 
 
@@ -679,4 +679,3 @@ var everythingLoaded = setInterval(function() {
 
 
 window.addEventListener('resize', adjustViewspace, false);
-$(document).click(onDocumentClick)
