@@ -604,7 +604,7 @@ function onVideoEnded() {
 
 function initVideoInput() {
 
-    video = document.querySelector('video');
+    video = document.getElementById('tv-video');
     enableInlineVideo(video)
 
     video.width = ortho_width;
