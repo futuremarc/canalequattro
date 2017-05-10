@@ -248,7 +248,7 @@ function onCountdownInterval() {
     $m.text(m);
     $s.text(s);
 
-    if (d < 1 && h < 1 && m < 1 && s < 5 && s > 3 && !isVideoPlaying) playCountdownSound()
+    if (d < 1 && h < 1 && m < 1 && s < 5 && s > 3 && !isVideoPlaying && isTvPowered) playCountdownSound()
 
     if (d < 1 && h < 1 && m < 1 && s < 1 && !isVideoPlaying) {
 
@@ -455,8 +455,8 @@ var initCanvas = function() {
         scene.add(camera);
 
         switchToImageMode()
-        animate();
         $(document).click(onDocumentClick)
+        animate();
     });
 
 
