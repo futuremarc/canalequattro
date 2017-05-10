@@ -10,7 +10,7 @@ for (var i = 0; i < 24; i++){
 
     for (var j = 0; j < 60/pace; j++){
         minute += pace
-        var date = '9-5-2017 ' + hour + ':' + minute +':00 EDT'
+        var date = '10-5-2017 ' + hour + ':' + minute +':00 EDT'
         dates.push(date)
     }
 
