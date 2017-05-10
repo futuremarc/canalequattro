@@ -1,6 +1,8 @@
 var dates = ['11-5-2017 07:00:00 EDT', '11-5-2017 14:00:00 EDT', '11-5-2017 20:00:00 EDT', '11-5-2017 23:00:00 EDT']
 
 var audioCtx = new(window.AudioContext || window.webkitAudioContext || window.mozAudioContext || window.msAudioContext)();
+
+
 var analyserNode = audioCtx.createAnalyser();
 var bufferLength = analyserNode.frequencyBinCount;
 var audioInput = new Uint8Array(bufferLength);
@@ -53,6 +55,20 @@ var volume = 1;
 var curveNumber = -3
 var curving, height
 var isGenerativeInput = false
+
+
+function isWebGLAvailable() {
+    try {
+        var canvas = document.createElement("canvas");
+        return !!
+            window.WebGLRenderingContext && 
+            (canvas.getContext("webgl") || 
+                canvas.getContext("experimental-webgl"));
+    } catch(e) { 
+        return false;
+    } 
+}
+
 
 function initGenerativeNoiseInput() {
 
@@ -300,7 +316,7 @@ var initCanvas = function() {
 
     scene = new THREE.Scene();
     camera = new THREE.OrthographicCamera(ortho_width / -2, ortho_width / 2, ortho_height / 2, ortho_height / -2, ortho_near, ortho_far);
-    renderer = new THREE.WebGLRenderer();
+    renderer = isWebGLAvailable() ? new THREE.WebGLRenderer() : new THREE.CanvasRenderer();
     renderer.setClearColor(0x000000, 0);
     container = document.getElementById('canale-container');
 
