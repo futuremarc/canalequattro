@@ -267,8 +267,6 @@ function getCurrentCountdown(dates) {
         var diffTime = eventTime - currentTime;
         var duration = moment.duration(diffTime * 1000, 'milliseconds');
 
-        console.log('diffTime', diffTime, 'duration', duration.asMilliseconds(), 'video duration', video.duration, diffTime < 0 && diffTime > -video.duration)
-
         if (diffTime < 0 && diffTime > -video.duration + 1) {
 
             console.log('play video from', diffTime * -1)
@@ -314,14 +312,6 @@ var initCanvas = function() {
     renderer.setSize(container.offsetWidth, container.offsetHeight);
 
     container.appendChild(renderer.domElement);
-    $clock = $('<div class="clock"></div>').appendTo(container)
-
-
-    $d = $('<div></div>').appendTo($clock); //use spaces as placeholders for numbers
-    $h = $('<div></div>').appendTo($clock);
-    $m = $('<div></div>').appendTo($clock);
-    $s = $('<div></div>').appendTo($clock);
-
 
     video_tex = new THREE.Texture(video);
 
@@ -648,6 +638,16 @@ function isIOS() {
 function onDocumentLoaded() {
 
     imgContainer = $('#tv-set')[0]
+    
+    container = document.getElementById('canale-container')
+    $clock = $('<div class="clock"></div>').appendTo(container)
+
+    $d = $('<div></div>').appendTo($clock);
+    $h = $('<div></div>').appendTo($clock);
+    $m = $('<div></div>').appendTo($clock);
+    $s = $('<div></div>').appendTo($clock);
+
+
     initVideoInput();
     initAudioInput()
     if (isIOS()) initGenerativeNoiseInput()
