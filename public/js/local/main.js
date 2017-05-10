@@ -544,7 +544,7 @@ var audioCtx, analyserNode, bufferLength, audioInput, audioEnv
 var initAudioNodes = function(source) {
 
     audioEnv = window.AudioContext || window.webkitAudioContext || window.mozAudioContext || window.msAudioContext
-    audioCtx = new env();
+    audioCtx = new audioEnv();
     analyserNode = audioCtx.createAnalyser();
     bufferLength = analyserNode.frequencyBinCount;
     audioInput = new Uint8Array(bufferLength);
