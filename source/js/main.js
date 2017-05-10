@@ -635,6 +635,8 @@ function isIOS() {
     return /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream
 }
 
+var $d, $h, $m, $s
+
 function onDocumentLoaded() {
 
     imgContainer = $('#tv-set')[0]
