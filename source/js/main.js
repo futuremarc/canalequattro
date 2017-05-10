@@ -309,7 +309,7 @@ var initCanvas = function() {
 
     scene = new THREE.Scene();
     camera = new THREE.OrthographicCamera(ortho_width / -2, ortho_width / 2, ortho_height / 2, ortho_height / -2, ortho_near, ortho_far);
-    renderer = isWebGLAvailable() ? new THREE.WebGLRenderer() : new THREE.CanvasRenderer();
+    renderer =  new THREE.CanvasRenderer();
     renderer.setClearColor(0x000000, 0);
     container = document.getElementById('canale-container');
 
