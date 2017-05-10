@@ -511,10 +511,13 @@ function onDocumentClick() {
         showScene()
 
         if (isCanaleInitialized) {
-            audio.play()
             audioTvOff.pause()
             video.muted = false
+            
+            if (isVideoPlaying) audio.pause()
+            else audio.play()
         }
+
 
     } else {
 
