@@ -248,7 +248,7 @@ function onCountdownInterval() {
     $m.text(m);
     $s.text(s);
 
-    if (d < 1 && h < 1 && m < 1 && s < 5 && s > 3 && !isVideoPlaying) playCountdownSound()
+    if (d < 1 && h < 1 && m < 1 && s < 5 && s > 3 && !isVideoPlaying && isTvPowered) playCountdownSound()
 
     if (d < 1 && h < 1 && m < 1 && s < 1 && !isVideoPlaying) {
 
@@ -455,14 +455,15 @@ var initCanvas = function() {
         scene.add(camera);
 
         switchToImageMode()
+        $(document).click(onDocumentClick)
         animate();
-
     });
 
 
 };
 
 var isCanaleInitialized = false
+var $clock
 
 function showScene() {
 
@@ -490,6 +491,8 @@ function hideScene() {
 }
 
 function onDocumentClick() {
+
+    if (!$clock) return
 
     if (!isCanaleInitialized && video && audio) {
 
@@ -679,4 +682,3 @@ var everythingLoaded = setInterval(function() {
 
 
 window.addEventListener('resize', adjustViewspace, false);
-$(document).click(onDocumentClick)
