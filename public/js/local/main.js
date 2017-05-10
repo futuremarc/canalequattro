@@ -315,7 +315,7 @@ var initCanvas = function() {
     renderer = isWebGLAvailable() ? new THREE.WebGLRenderer() : new THREE.CanvasRenderer();
     renderer.setClearColor(0x000000, 0);
     container = document.getElementById('canale-container');
- video_mesh.material.map = image_tex
+
     var imgConWidth = imgContainer.offsetWidth
     var rendererWidth = imgConWidth / rendererToImageRatio
     container.style.width = rendererWidth + 'px'
@@ -542,7 +542,6 @@ function switchToImageMode() {
 
     if (isWebGL) video_mat.uniforms['u_comp_mode'].value = 1;
     else video_mesh.material.map = image_tex
-
     video_mesh_norm.material.map = image_tex
     video_tex.needsUpdate = true
     image_tex.needsUpdate = true
