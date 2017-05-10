@@ -1,4 +1,4 @@
-var dates = ['11-5-2017 07:00:00 EDT', '11-5-2017 14:00:00 EDT', '11-5-2017 20:00:00 EDT', '11-5-2017 23:00:00 EDT']
+var dates = ['11-5-2017 07:00:00', '11-5-2017 14:00:00', '11-5-2017 20:00:00', '11-5-2017 23:00:00']
 
 var scene, buffer_scene, camera, buffer_cam, renderer, container;
 var image_tex, video, audio, audioTvOff, buffer, pre_video_tex, video_tex, video_mat, video_mesh, video_geo, buffer_mat, buffer_geo, buffer_mesh, video_tex_norm, video_mat_norm, video_mesh_norm, video_geo_norm;
