@@ -215,9 +215,7 @@ var render = function() {
     }
 
 
-
     renderer.render(scene, camera);
-
     timer++;
 
     if (zero_to_one > 1.) zero_to_one = 0.;
@@ -317,7 +315,7 @@ var initCanvas = function() {
     renderer = isWebGLAvailable() ? new THREE.WebGLRenderer() : new THREE.CanvasRenderer();
     renderer.setClearColor(0x000000, 0);
     container = document.getElementById('canale-container');
-
+ video_mesh.material.map = image_tex
     var imgConWidth = imgContainer.offsetWidth
     var rendererWidth = imgConWidth / rendererToImageRatio
     container.style.width = rendererWidth + 'px'
@@ -340,6 +338,7 @@ var initCanvas = function() {
         video_tex.minFilter = THREE.LinearFilter //- to use non powers of two image
         image_tex.minFilter = THREE.LinearFilter
 
+        if (isWebGL){
         video_mat = new THREE.ShaderMaterial({
             uniforms: {
                 'u_video_tex': {
@@ -425,6 +424,18 @@ var initCanvas = function() {
             depthWrite: false,
             transparent: true
         });
+    }else{
+
+         video_mat = new THREE.MeshBasicMaterial({
+            map: image_tex,
+            color: 0xffffff,
+            transparent: true,
+            opacity: .93,
+            depthWrite: false,
+            transparent: true
+        });
+
+    }
 
         video_geo = new THREE.PlaneGeometry(ortho_width, ortho_height);
         video_mesh = new THREE.Mesh(video_geo, video_mat);
@@ -529,7 +540,9 @@ function onDocumentClick() {
 
 function switchToImageMode() {
 
-    video_mat.uniforms['u_comp_mode'].value = 1;
+    if (isWebGL) video_mat.uniforms['u_comp_mode'].value = 1;
+    else video_mesh.material.map = image_tex
+
     video_mesh_norm.material.map = image_tex
     video_tex.needsUpdate = true
     image_tex.needsUpdate = true
@@ -538,7 +551,8 @@ function switchToImageMode() {
 
 function switchToVideoMode() {
 
-    video_mat.uniforms['u_comp_mode'].value = 0
+    if (isWebGL) video_mat.uniforms['u_comp_mode'].value = 0
+    else video_mesh.material.map = video_tex
     video_mesh_norm.material.map = video_tex
     video_tex.needsUpdate = true
     image_tex.needsUpdate = true
