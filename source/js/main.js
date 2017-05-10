@@ -140,10 +140,10 @@ var render = function() {
             $clock.removeClass('animate-glitch')
             break;
         case 50 || 600:
-            $clock.addClass('animate-glitch')
+            if (isWebGL) $clock.addClass('animate-glitch')
             break;
         case 600:
-            $clock.addClass('animate-glitch')
+            if (isWebGL) $clock.addClass('animate-glitch')
             break;
     }
 
