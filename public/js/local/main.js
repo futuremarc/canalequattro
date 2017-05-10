@@ -48,7 +48,7 @@ var volume = 1;
 var curveNumber = -3
 var curving, height
 var isGenerativeInput = false
-
+var isWebGL = false
 
 function isWebGLAvailable() {
     try {
@@ -60,7 +60,10 @@ function isWebGLAvailable() {
     } catch (e) {
         return false;
     }
+
 }
+
+isWebGL = isWebGLAvailable()
 
 
 function initGenerativeNoiseInput() {
@@ -162,55 +165,57 @@ var render = function() {
 
     if (isGlitch && !isVideoPlaying) {
 
-        video_mesh_norm.visible = false
-        video_mesh.visible = true
+            video_mesh_norm.visible = false
+            video_mesh.visible = true
 
-        if (isGenerativeInput) {
+        if (isWebGL) {
 
-            getGenerativeInput()
+            if (isGenerativeInput) {
 
-            var tre = height / 255.;
-            var mid = height / 255.;
-            var bass = height / 255.;
+                getGenerativeInput()
+
+                var tre = height / 255.;
+                var mid = height / 255.;
+                var bass = height / 255.;
 
 
-        } else {
+            } else {
 
-            getAudioInput();
+                getAudioInput();
 
-            var tre = audioInput[200] / 255.;
-            var mid = audioInput[100] / 255.;
-            var bass = audioInput[2] / 255.;
+                var tre = audioInput[200] / 255.;
+                var mid = audioInput[100] / 255.;
+                var bass = audioInput[2] / 255.;
 
+            }
+
+
+            video_mat.uniforms['u_video_tex'].value = video_tex;
+            video_mat.uniforms['u_image_tex'].value = image_tex;
+            video_mat.uniforms['u_blend_mode'].value = blending_mode;
+            video_mat.uniforms['u_time'].value = timer;
+            video_mat.uniforms['u_bass'].value = bass;
+            video_mat.uniforms['u_mid'].value = mid;
+            video_mat.uniforms['u_treble'].value = tre;
+            video_mat.uniforms['u_0to1'].value = zero_to_one;
+            video_mat.uniforms['u_random'].value = Math.random();
+            video_mat.uniforms['u_bnw'].value = is_bnw;
+            video_mat.uniforms['u_mic_sensitivity'].value = mic_sensitivity;
+            video_mat.uniforms['u_mic_compressor'].value = mic_compressor;
+            video_mat.uniforms['u_colorR'].value = colorR;
+            video_mat.uniforms['u_colorG'].value = colorG;
+            video_mat.uniforms['u_colorB'].value = colorB;
+            video_mat.uniforms['u_brightness'].value = brightness;
+            video_mat.uniforms['u_contrast'].value = contrast;
+            renderer.clear();
         }
-
-
-        video_mat.uniforms['u_video_tex'].value = video_tex;
-        video_mat.uniforms['u_image_tex'].value = image_tex;
-        video_mat.uniforms['u_blend_mode'].value = blending_mode;
-        video_mat.uniforms['u_time'].value = timer;
-        video_mat.uniforms['u_bass'].value = bass;
-        video_mat.uniforms['u_mid'].value = mid;
-        video_mat.uniforms['u_treble'].value = tre;
-        video_mat.uniforms['u_0to1'].value = zero_to_one;
-        video_mat.uniforms['u_random'].value = Math.random();
-        video_mat.uniforms['u_bnw'].value = is_bnw;
-        video_mat.uniforms['u_mic_sensitivity'].value = mic_sensitivity;
-        video_mat.uniforms['u_mic_compressor'].value = mic_compressor;
-        video_mat.uniforms['u_colorR'].value = colorR;
-        video_mat.uniforms['u_colorG'].value = colorG;
-        video_mat.uniforms['u_colorB'].value = colorB;
-        video_mat.uniforms['u_brightness'].value = brightness;
-        video_mat.uniforms['u_contrast'].value = contrast;
-
-
     } else {
         video_mesh.visible = false
         video_mesh_norm.visible = true
     }
 
 
-    renderer.clear();
+
     renderer.render(scene, camera);
 
     timer++;
