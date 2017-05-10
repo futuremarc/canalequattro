@@ -1,4 +1,23 @@
-var dates = ['11-5-2017 07:00:00', '11-5-2017 14:00:00', '11-5-2017 20:00:00', '11-5-2017 23:00:00']
+var dates = []
+
+var date = new Date('5/11/2017 11:00:00 UTC');
+date.toString()
+dates.push(date)
+
+var date = new Date('5/11/2017 18:00:00 UTC');
+date.toString()
+dates.push(date)
+
+var date = new Date('12-5-2017 00:00:00 UTC');
+date.toString()
+dates.push(date)
+
+var date = new Date('12-5-2017 03:00:00 UTC');
+date.toString()
+dates.push(date)
+
+
+// var dates = ['11-5-2017 11:00:00 UTC', '11-5-2017 18:00:00 UTC', '12-5-2017 00:00:00 UTC', '12-5-2017 03:00:00 UTC']
 
 var scene, buffer_scene, camera, buffer_cam, renderer, container;
 var image_tex, video, audio, audioTvOff, buffer, pre_video_tex, video_tex, video_mat, video_mesh, video_geo, buffer_mat, buffer_geo, buffer_mesh, video_tex_norm, video_mat_norm, video_mesh_norm, video_geo_norm;
