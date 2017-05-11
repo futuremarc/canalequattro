@@ -724,6 +724,14 @@ var $d, $h, $m, $s
 
 function onDocumentLoaded() {
 
+    if (/MSIE (\d+\.\d+);/.test(navigator.userAgent) || navigator.userAgent.indexOf("Trident/") > -1) {
+
+        $('.loading').data('text', 'Use Another Browser')
+        $('.loading').html('text', 'Use Another Browser')
+
+        return
+    }
+
     imgContainer = $('#tv-set')[0]
 
     container = document.getElementById('canale-container')
