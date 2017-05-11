@@ -30,14 +30,14 @@ function initSchedule() {
         hour++
         for (var j = 0; j < 60 / pace; j++) {
             minute += pace
-            var date = '10-5-2017 ' + hour + ':' + minute + ':00 EDT'
+            var date = '11-5-2017 ' + hour + ':' + minute + ':00 EDT'
             dates.push(date)
         }
         minute = 0
     }
 }
 
-// initSchedule()
+initSchedule()
 
 var scene, buffer_scene, camera, buffer_cam, renderer, container;
 var image_tex, video, audio, countdownVideo, audioTvOff, buffer, pre_video_tex, video_tex, video_mat, video_mesh, video_geo, buffer_mat, buffer_geo, buffer_mesh, video_mat_norm, video_mesh_norm, video_geo_norm;
@@ -639,12 +639,12 @@ var getAudioInput = function() {
 
 function initAudioInput() {
 
-    audioTvOff = document.getElementById('noise-tv-off');
+    audioTvOff = document.getElementById('tv-noise-off');
     audioTvOff.loop = true
     audioTvOff.volume = .1
     audioTvOff.play()
 
-    audio = document.getElementById('noise-tv-on');
+    audio = document.getElementById('tv-noise');
     audio.loop = true
     audio.volume = .1
     if (!isIOS()) initAudioNodes(audio)
@@ -723,6 +723,14 @@ function isIOS() {
 var $d, $h, $m, $s
 
 function onDocumentLoaded() {
+
+    if (/MSIE (\d+\.\d+);/.test(navigator.userAgent) || navigator.userAgent.indexOf("Trident/") > -1) {
+
+        $('.loading').data('text', 'Use Another Browser')
+        $('.loading').html('Use Another Browser')
+
+        return
+    }
 
 
     imgContainer = $('#tv-set')[0]
