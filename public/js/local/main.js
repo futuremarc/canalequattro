@@ -37,7 +37,7 @@ function initSchedule() {
     }
 }
 
-// initSchedule()
+initSchedule()
 
 var scene, buffer_scene, camera, buffer_cam, renderer, container;
 var image_tex, video, audio, countdownVideo, audioTvOff, buffer, pre_video_tex, video_tex, video_mat, video_mesh, video_geo, buffer_mat, buffer_geo, buffer_mesh, video_mat_norm, video_mesh_norm, video_geo_norm;
@@ -639,12 +639,12 @@ var getAudioInput = function() {
 
 function initAudioInput() {
 
-    audioTvOff = document.getElementById('tv-noise-off');
+    audioTvOff = document.getElementById('noise-tv-off');
     audioTvOff.loop = true
     audioTvOff.volume = .1
     audioTvOff.play()
 
-    audio = document.getElementById('tv-noise');
+    audio = document.getElementById('noise-tv-on');
     audio.loop = true
     audio.volume = .1
     if (!isIOS()) initAudioNodes(audio)
