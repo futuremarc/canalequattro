@@ -142,13 +142,13 @@ body{
 
             @media(max-width: 768px){
                 font-size:3.5vh;
-                top:16%;
+                top:20%;
                 right:5%;
             }
 
             @media only screen and (min-width: 480px) and (max-width: 768px) and (orientation: portrait){
 
-                top:19%;
+                top:16%;
                 right:4%;
             }
 
@@ -156,7 +156,7 @@ body{
             
             top:19%;
             right:5%;
-            font-size:4.1vh;
+            font-size:4.5vh;
         }
             
 
@@ -169,11 +169,11 @@ body{
                     
                     margin-left:.63vh;
                     margin-right:.63vh;
-                    font-size:2.6vh;
+                    font-size:2.85vh;
                 }
 
                  @media only screen and (min-width: 480px) and (max-width: 768px) and (orientation: landscape){
-                    font-size:4.3vh;
+                    font-size:5.3vh;
                     margin-left:1.3vh;
                     margin-right:1.3vh;
                     right:6%;
