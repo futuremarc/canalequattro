@@ -8,11 +8,11 @@ var date = new Date('5/11/2017 18:00:00 UTC');
 date.toString()
 dates.push(date)
 
-var date = new Date('12-5-2017 00:00:00 UTC');
+var date = new Date('5/12/2017 00:00:00 UTC');
 date.toString()
 dates.push(date)
 
-var date = new Date('12-5-2017 03:00:00 UTC');
+var date = new Date('5/12/2017 03:00:00 UTC');
 date.toString()
 dates.push(date)
 
