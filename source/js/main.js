@@ -37,7 +37,7 @@ function initSchedule() {
     }
 }
 
-initSchedule()
+// initSchedule()
 
 var scene, buffer_scene, camera, buffer_cam, renderer, container;
 var image_tex, video, audio, countdownVideo, audioTvOff, buffer, pre_video_tex, video_tex, video_mat, video_mesh, video_geo, buffer_mat, buffer_geo, buffer_mesh, video_mat_norm, video_mesh_norm, video_geo_norm;
