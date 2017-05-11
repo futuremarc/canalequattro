@@ -728,6 +728,7 @@ function onDocumentLoaded() {
 
         $('.loading').data('text', 'Use Another Browser')
         $('.loading').html('Use Another Browser')
+        $('.loading').css('transform','translateX(0%)')
 
         return
     }
