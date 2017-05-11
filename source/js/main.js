@@ -694,7 +694,7 @@ function initVideoInput() {
 
     video.width = ortho_width;
     video.height = ortho_height;
-    video.src = 'video/phoenix.mp4'
+    video.src = 'video/tv-video.mp4'
 
     $(video).on('ended', onVideoEnded)
     $(video).on('loadedmetadata', onVideoLoaded)
