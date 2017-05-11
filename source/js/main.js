@@ -17,10 +17,30 @@ date.toString()
 dates.push(date)
 
 
-// var dates = ['11-5-2017 11:00:00 UTC', '11-5-2017 18:00:00 UTC', '12-5-2017 00:00:00 UTC', '12-5-2017 03:00:00 UTC']
+var hour = 0
+var minute = 0
+var pace = 10
+
+function initSchedule() {
+
+    dates = []
+
+    for (var i = 0; i < 24; i++) {
+
+        hour++
+        for (var j = 0; j < 60 / pace; j++) {
+            minute += pace
+            var date = '10-5-2017 ' + hour + ':' + minute + ':00 EDT'
+            dates.push(date)
+        }
+        minute = 0
+    }
+}
+
+// initSchedule()
 
 var scene, buffer_scene, camera, buffer_cam, renderer, container;
-var image_tex, video, audio, audioTvOff, buffer, pre_video_tex, video_tex, video_mat, video_mesh, video_geo, buffer_mat, buffer_geo, buffer_mesh, video_tex_norm, video_mat_norm, video_mesh_norm, video_geo_norm;
+var image_tex, video, audio, countdownVideo, audioTvOff, buffer, pre_video_tex, video_tex, video_mat, video_mesh, video_geo, buffer_mat, buffer_geo, buffer_mesh, video_mat_norm, video_mesh_norm, video_geo_norm;
 
 var ortho_width = 1920,
     ortho_height = 1080,
@@ -139,6 +159,7 @@ var render = function() {
     camera.lookAt(scene.position);
 
     if (video.readyState === video.HAVE_ENOUGH_DATA) video_tex.needsUpdate = true;
+    if (countdownVideo.readyState === countdownVideo.HAVE_ENOUGH_DATA) image_tex.needsUpdate = true;
 
     if (!isVideoPlaying) {
         video_mesh_norm.visible = false
@@ -184,8 +205,8 @@ var render = function() {
 
     if (isGlitch && !isVideoPlaying) {
 
-            video_mesh_norm.visible = false
-            video_mesh.visible = true
+        video_mesh_norm.visible = false
+        video_mesh.visible = true
 
         if (isWebGL) {
 
@@ -344,20 +365,17 @@ var initCanvas = function() {
 
     container.appendChild(renderer.domElement);
 
-    video_tex = new THREE.Texture(video);
+    video_tex = new THREE.VideoTexture(video);
 
-    var src = 'img/tv-screen.png'
+    image_tex = new THREE.VideoTexture(countdownVideo);
 
-    image_tex = new THREE.TextureLoader().load(src, function() {
+    document.body.appendChild(container);
 
-        document.body.appendChild(container);
-        console.log('done loading image')
+    video_tex.minFilter = THREE.LinearFilter //- to use non powers of two image
+    image_tex.minFilter = THREE.LinearFilter
 
+    if (isWebGL) {
 
-        video_tex.minFilter = THREE.LinearFilter //- to use non powers of two image
-        image_tex.minFilter = THREE.LinearFilter
-
-        if (isWebGL){
         video_mat = new THREE.ShaderMaterial({
             uniforms: {
                 'u_video_tex': {
@@ -443,9 +461,10 @@ var initCanvas = function() {
             depthWrite: false,
             transparent: true
         });
-    }else{
 
-         video_mat = new THREE.MeshBasicMaterial({
+    } else {
+
+        video_mat = new THREE.MeshBasicMaterial({
             map: image_tex,
             color: 0xffffff,
             transparent: true,
@@ -456,31 +475,30 @@ var initCanvas = function() {
 
     }
 
-        video_geo = new THREE.PlaneGeometry(ortho_width, ortho_height);
-        video_mesh = new THREE.Mesh(video_geo, video_mat);
-        scene.add(video_mesh);
+    video_geo = new THREE.PlaneGeometry(ortho_width, ortho_height);
+    video_mesh = new THREE.Mesh(video_geo, video_mat);
+    scene.add(video_mesh);
 
-        video_mat_norm = new THREE.MeshBasicMaterial({
-            map: image_tex,
-            color: 0xffffff,
-            transparent: true,
-            opacity: .93,
-            depthWrite: false,
-            transparent: true
-        });
-
-        video_geo_norm = new THREE.PlaneGeometry(ortho_width, ortho_height);
-        video_mesh_norm = new THREE.Mesh(video_geo_norm, video_mat_norm);
-
-        scene.add(video_mesh_norm);
-        scene.add(camera);
-
-        switchToImageMode()
-        $(document).click(onDocumentClick)
-        $('.loading').hide()
-        $('.content').show()
-        animate();
+    video_mat_norm = new THREE.MeshBasicMaterial({
+        map: image_tex,
+        color: 0xffffff,
+        transparent: true,
+        opacity: .93,
+        depthWrite: false,
+        transparent: true
     });
+
+    video_geo_norm = new THREE.PlaneGeometry(ortho_width, ortho_height);
+    video_mesh_norm = new THREE.Mesh(video_geo_norm, video_mat_norm);
+
+    scene.add(video_mesh_norm);
+    scene.add(camera);
+
+    switchToImageMode()
+    $(document).click(onDocumentClick)
+    $('.loading').hide()
+    $('.content').show()
+    animate();
 
 
 };
@@ -515,10 +533,11 @@ function hideScene() {
 
 function onDocumentClick() {
 
-    if (!isCanaleInitialized && video && audio) {
+    if (!isCanaleInitialized && video && audio && countdownVideo) {
 
         console.log('canale initialized')
         video.play();
+        countdownVideo.play()
         if (!isVideoPlaying) video.pause()
         audio.play();
         isCanaleInitialized = true
@@ -658,6 +677,18 @@ function onVideoEnded() {
 
 function initVideoInput() {
 
+
+    countdownVideo = document.getElementById('tv-countdown');
+    enableInlineVideo(countdownVideo)
+
+    countdownVideo.width = ortho_width;
+    countdownVideo.height = ortho_height;
+    countdownVideo.src = 'video/tv-countdown.mp4'
+    countdownVideo.muted = true
+    countdownVideo.loop = true
+    countdownVideo.load()
+
+
     video = document.getElementById('tv-video');
     enableInlineVideo(video)
 
@@ -715,23 +746,6 @@ document.ontouchmove = function(e) {
     e.preventDefault();
 }
 
-var hour = 0
-var minute = 0
-var pace = 10
-
-function initSchedule() {
-
-    for (var i = 0; i < 24; i++) {
-
-        hour++
-        for (var j = 0; j < 60 / pace; j++) {
-            minute += pace
-            var date = '10-5-2017 ' + hour + ':' + minute + ':00 EDT'
-            dates.push(date)
-        }
-        minute = 0
-    }
-}
 
 var everythingLoaded = setInterval(function() {
     if (/complete/.test(document.readyState)) {

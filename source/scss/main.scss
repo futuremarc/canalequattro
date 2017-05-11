@@ -278,15 +278,15 @@ body{
 
 
 .animate-glow-halo {
-    animation: glowAnimHalo 10s infinite;
+    animation: glowAnimHalo 5s infinite;
 }
 
 @keyframes glowAnimHalo {
   0%   { opacity: .55; }
-  20%  { opacity: .9; }
+  20%  { opacity: .85; }
   25%  { opacity: .7; }
   35%  { opacity: .6; }
-  55%  { opacity: .7; }
+  45%  { opacity: .7; }
   70%  { opacity: .8; }
   100% { opacity: .55; }
 }
