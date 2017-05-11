@@ -14,11 +14,11 @@
  }
 
 body{
-		margin: 0;
-		padding: 0;
-		background-color: black;
+    margin: 0;
+    padding: 0;
+    background-color: black;
         color:  rgba(255,255,255,.7);
-		font-family: 'VCR_OSD_MONO_1';
+    font-family: 'VCR_OSD_MONO_1';
         user-select: none;
         overflow: hidden;
         -moz-user-select: none;
@@ -27,15 +27,15 @@ body{
         -o-user-select: none;
 
 
-    img{
+   img{
         width:auto;
         height:100%;
         top:0;
 
-            @media(min-width: 768px){
-                top:-30%;
-                height:160%;
-            }
+        @media(min-width: 768px){
+            top:-30%;
+            height:160%;
+        }
 
         margin:auto;
         left:0;
@@ -45,12 +45,12 @@ body{
         margin-left: 50%;
         transform: translateX(-50%);
 
-            @media only screen and (min-width: 480px) and (max-width: 768px) and (orientation: landscape){
+        @media only screen and (min-width: 480px) and (max-width: 768px) and (orientation: landscape){
 
-                top:-40%;
-                height:180%;
-            }
-        
+            top:-40%;
+            height:180%;
+        }
+    
 
     }
 
@@ -346,7 +346,7 @@ body{
   color:white;
   font-size:40px;
   position:relative;
-  margin:0 auto;
+  margin: 0 auto;
 }
 
 .loading:after{
@@ -375,4 +375,3 @@ body{
   clip:rect(0,900px,0,0); 
   animation:noiseAnim2 1s infinite linear alternate-reverse;
 }
-

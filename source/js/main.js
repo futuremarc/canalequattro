@@ -724,14 +724,6 @@ var $d, $h, $m, $s
 
 function onDocumentLoaded() {
 
-    if (/MSIE (\d+\.\d+);/.test(navigator.userAgent) || navigator.userAgent.indexOf("Trident/") > -1) {
-
-        $('.loading').data('text', 'Use Another Browser')
-        $('.loading').html('Use Another Browser')
-        $('.loading').css('transform','translateX(0%)')
-
-        return
-    }
 
     imgContainer = $('#tv-set')[0]
 
