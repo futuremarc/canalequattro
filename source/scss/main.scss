@@ -140,9 +140,10 @@ body{
             position:absolute;
             display:none;
 
-            @media(max-width: 768px){
-                font-size:3.5vh;
-                top:20%;
+            
+            @media only screen and (min-width: 480px) and (max-width: 768px) and (orientation: landscape){
+
+                top:19%;
                 right:5%;
             }
 
@@ -173,7 +174,7 @@ body{
                 }
 
                  @media only screen and (min-width: 480px) and (max-width: 768px) and (orientation: landscape){
-                    font-size:5.3vh;
+                    font-size:5.1vh;
                     margin-left:1.3vh;
                     margin-right:1.3vh;
                     right:6%;
