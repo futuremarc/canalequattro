@@ -727,7 +727,7 @@ function onDocumentLoaded() {
     if (/MSIE (\d+\.\d+);/.test(navigator.userAgent) || navigator.userAgent.indexOf("Trident/") > -1) {
 
         $('.loading').data('text', 'Use Another Browser')
-        $('.loading').html('text', 'Use Another Browser')
+        $('.loading').html('Use Another Browser')
 
         return
     }
