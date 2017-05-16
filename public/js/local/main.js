@@ -709,9 +709,13 @@ function initVideoInput() {
 var adjustViewspace = function() {
 
     var imgConWidth = imgContainer.offsetWidth
+    var imgConHeight = imgContainer.offsetHeight
     var rendererWidth = imgConWidth / rendererToImageRatio
 
     container.style.width = rendererWidth + 'px'
+    iFrame.style.width = imgConWidth 
+    iFrame.style.height = imgConHeight 
+
     renderer.setSize(container.offsetWidth, container.offsetHeight);
     camera.aspect = container.offsetWidth / container.offsetHeight;
     camera.updateProjectionMatrix();
@@ -735,6 +739,7 @@ function onDocumentLoaded() {
 
 
     imgContainer = $('#tv-set')[0]
+    iFrame = $('iframe')[0]
 
     container = document.getElementById('canale-container')
     $clock = $('<div class="clock"></div>').appendTo(container)
