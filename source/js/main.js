@@ -1,21 +1,20 @@
 var dates = []
 
-var date = new Date('5/11/2017 11:00:00 UTC');
-date.toString()
-dates.push(date)
+// var date = new Date('5/11/2017 11:00:00 UTC');
+// date.toString()
+// dates.push(date)
 
-var date = new Date('5/11/2017 18:00:00 UTC');
-date.toString()
-dates.push(date)
+// var date = new Date('5/11/2017 18:00:00 UTC');
+// date.toString()
+// dates.push(date)
 
-var date = new Date('5/12/2017 00:00:00 UTC');
-date.toString()
-dates.push(date)
+// var date = new Date('5/12/2017 00:00:00 UTC');
+// date.toString()
+// dates.push(date)
 
-var date = new Date('5/12/2017 03:00:00 UTC');
-date.toString()
-dates.push(date)
-
+// var date = new Date('5/12/2017 03:00:00 UTC');
+// date.toString()
+// dates.push(date)
 
 
 var hour = 0
@@ -38,7 +37,6 @@ function initSchedule() {
     }
 }
 
-// initSchedule()
 
 var scene, buffer_scene, camera, buffer_cam, renderer, container;
 var image_tex, video, audio, countdownVideo, audioTvOff, buffer, pre_video_tex, video_tex, video_mat, video_mesh, video_geo, buffer_mat, buffer_geo, buffer_mesh, video_mat_norm, video_mesh_norm, video_geo_norm;
@@ -180,7 +178,7 @@ var render = function() {
         case 700:
             $clock.removeClass('animate-glitch')
             break;
-        case 50 || 600:
+        case 100 || 600:
             if (isWebGL) $clock.addClass('animate-glitch')
             break;
         case 600:
@@ -188,7 +186,7 @@ var render = function() {
             break;
     }
 
-    if (timer > 50 && timer < 150) {
+    if (timer > 100 && timer < 150) {
         isGlitch = true
         if (!isVideoPlaying) audio.play();
     } else if (timer > 150 && timer < 600) {
@@ -267,6 +265,8 @@ var render = function() {
 var isCountdownInitialized = false
 
 function onCountdownInterval() {
+
+    if (!currentDuration) return
 
     currentDuration = moment.duration(currentDuration.asMilliseconds() - interval, 'milliseconds');
 
@@ -536,6 +536,17 @@ function onDocumentClick() {
 
     if (!isCanaleInitialized && video && audio && countdownVideo) {
 
+        var date = new Date();
+        date.setSeconds(date.getSeconds() + 10);
+        date.toString()
+        dates.push(date)
+
+        clearInterval(countdownInterval);
+        countdownInterval = setInterval(onCountdownInterval, interval);
+        getCurrentCountdown(dates)
+
+
+
         console.log('canale initialized')
         video.play();
         countdownVideo.play()
@@ -712,11 +723,12 @@ var adjustViewspace = function() {
     var imgConHeight = imgContainer.offsetHeight
     var rendererWidth = imgConWidth / rendererToImageRatio
 
+    console.log('adjust', imgConWidth,imgConHeight)
+
     container.style.width = rendererWidth + 'px'
-    iFrame.style.width = imgConWidth 
-    iFrame.style.height = imgConHeight 
 
     renderer.setSize(container.offsetWidth, container.offsetHeight);
+
     camera.aspect = container.offsetWidth / container.offsetHeight;
     camera.updateProjectionMatrix();
 };
@@ -739,7 +751,6 @@ function onDocumentLoaded() {
 
 
     imgContainer = $('#tv-set')[0]
-    iFrame = $('iframe')[0]
 
     container = document.getElementById('canale-container')
     $clock = $('<div class="clock"></div>').appendTo(container)
